@@ -1,0 +1,715 @@
+\chapter{Classifying Configurations}
+\label{chapter:implementation}
+
+TODO: Verificar feasible capitulos anteriores
+TODO: Apresentar otimizacao de utilizar good calculadas no checador de solvables 
+TODO: Verificar se há parêntese colados em palavras de forma inadequada
+
+The main strategy of this work is to explore a brute force search algorithm to determine the number of unsolvable bad configurations (see Section~\ref{sec:configurations}) of a given tree 
+aiming to prove that in every tree with a given (sufficiently large) height every configuration is either good or solvable bad,
+i.e., there is no bad unsolvable configuration.
+In this chapter, we start with a simple version of this algorithm, discuss its complexity and limitations and then present some optimizations we used to arrive on a improved version. 
+We use a python inspired pseudo-code for ease of reading (and also because we implemented a checker in Sage math see Chapter~\ref{chap:4}) and in the next chapter we present the results obtained using a \texttt{C++} version of the improved algorithm.
+
+\section{A Simple Algorithm}\label{sec:naive-algo}
+Given a tree $T$,
+recall that, when \(T\) has height at least \(1\), 
+\(T^{(1)}\) is the tree obtained from \(T\) by removing \(L(T)\) (See section~\ref{sec:configurations}).
+By Lemma~\ref{lemma:child-costs}, we can obtain all bad configurations of \(T\) based on the costs ($RC$ and $FC$, see Definition~\ref{def:conf-costs}) of the configurations of $T^{(1)}$. 
+Calculating the costs of any configuration of a tree with height $0$ is trivial and follows directly from Definition~\ref{def:conf-costs}. 
+Then, to calculate the costs of any configuration \(conf\) of a tree with larger height
+we can use a ``bottom-up'' recursive algorithm that 
+computes these costs using the costs of each parents configuration of \(conf\) (see Algorithm~\ref{alg:naive-bottom-up:costs}).
+
+\begin{algorithm}
+\caption{Naive algorithm for calculating costs using a ``bottom-up'' strategy}\label{alg:naive-bottom-up:costs}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos, breaklines, escapeinside=||,mathescape=true]{python}
+def CalculateCosts(T, conf):
+    if len(conf) == 1:
+        if(conf[0] in |$B_1$|):
+            return 1,1
+        else:
+            return 0, |$\infty$|
+    #respectively the min parent free cost and the min parent restricted cost
+    minpfc, minprc = |$\infty$|, |$\infty$| 
+    levelcost    = sum([1 for x in conf if x in |$B_1$|])
+    for confp in ParentConfigurations(T,conf):
+        pfc, prc  = CalculateCosts(|$T^{(1)}$|, confp)
+        minpfc, minprc = min(minpfc, pfc), min(minprc, prc)
+    return minpfc + levelcost, minprc + levelcost
+\end{minted}
+\end{algorithm}
+
+
+Note that Algorithm~\ref{alg:naive-bottom-up:costs} calls an auxiliary function \texttt{ParentConfigurations}
+which returns (an iterator over) all of the parents configurations of \(conf\).
+The configurations are represented as vectors of colors (integers from 0 to 15)
+ordered according to their corresponding leafs which are ordered from left to right
+(the orderings of the leafs are discussed more deeply in Section~\ref{sec:signatures}).
+
+We generate the parents configurations of a given configuration $conf$ of a tree $T$ as follows.
+First, note that each parents configuration is a configuration of \(L(T^{(1)})\)
+such that each leaf \(\texttt{l}\) in \(L(T^{(1)})\) has a color adjacent to the colors of its children,
+i.e., \(\texttt{l}\) must receive a color that is in the intersection of the neighborhoods (in $CH$)
+of the colors of its children.
+This results in a set of possible colors that each vertex in $L(T^{(1)})$ can be colored with. 
+Then the Cartesian product\footnote{In Python the Cartesian product can be performed using the function \texttt{product} of the library \texttt{itertools}~\cite{itertools}} of these possible colors contains the set of all parents configurations of $conf$ (see Algorithm~\ref{alg:naive-bottom-up:parents}).
+Note that some of those configurations may be unfeasible as it is possible to choose colors for sibling vertices in $T^{(1)}$ such that the resulting configuration cannot be completed.
+The parents configurations of \(conf\)
+are precisely the feasible configurations in the Cartesian product of the possible colors.
+%TODO add "https://docs.python.org/3/library/itertools.html#itertools.product" no bib 
+
+\begin{algorithm}
+\caption{Returns iterator over parents configurations}\label{alg:naive-bottom-up:parents}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+def ParentConfigurations(T, conf):
+    if len(conf) == 1:
+        return []
+    choices = []
+    for l in L(|$T^{(1)}$|):
+        children    = Children(l)
+        choices_p   = |$\bigcap_{i \in children} N_{CH}(conf [i] )$|
+        if(len(choices_p) == 0): #guarantees earlier that conf is unfeasible
+            return []   
+        choices.append(choices_p) 
+    return product(choices)
+\end{minted}
+\end{algorithm}
+
+
+Finally, Algorithm \ref{alg:naive-bottom-up} returns all bad configurations on a given tree $T$ using Algorithm~\ref{alg:naive-bottom-up:costs}. 
+% It generates all configurations with \texttt{product} so that we iterate over all $16^{|L(T)|}$ configurations, including the non feasible ones, and calculate its costs. 
+% Calculate the costs of any given $conf$, on the other hand, iterates over all $16^{\frac{|L(T)|}{2}}$ parents configurations including non feasible ones and it calls itself recursively until the root of tree(base case) is reached. 
+
+\begin{algorithm}
+\caption{Returns all bad configurations on a given tree $T$}\label{alg:naive-bottom-up}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+def GenerateBadConfs(T):
+    bads = []
+    for conf in product(list(range(0,16)), repeat = len(L(T))):
+        fc, rc = CalculateCosts(T, conf)
+        if(fc != |$\infty$| and fc == rc): 
+            # fc != |$\infty$| means that conf is feasible
+            # fc == rc means that conf is bad
+            bads.Append(conf)
+    return bads 
+\end{minted}
+\end{algorithm}
+
+\subsubsection{Replacements}
+
+With Algorithm \ref{alg:naive-bottom-up} we are able to determine the number of bad configurations of any given complete cubic tree. 
+If there are no bad configurations, then Conjecture~\ref{conjecture:main-conjecture} is verified. 
+Unfortunately, due to the exponential complexity of Algorithm~\ref{alg:naive-bottom-up},
+this task cannot be pursued for a sufficiently large height.
+However, by Lemma~\ref{lemma:every-good-and-solvable-configuration}, 
+to prove Conjecture~\ref{conjecture:main-conjecture} it suffices to show that any complete cubic tree $T$ has no \emph{unsolvable} bad configurations. 
+
+For this, we introduce Algorithm \ref{alg:naive-replacements} to check which of the bad configurations are solvable and, as a consequence, which are unsolvable.
+% Suppose we have a set of unchecked bad configurations.
+Algorithm \ref{alg:naive-replacements} checks whether, for each bad configuration that was not yet ruled out as solvable, there is a vertex $v$ colored with $c_0$ for which there is replacement $(c_0, C)$ (See Algorithm~\ref{alg:naive-replacements:check}), 
+such that each similar configuration obtained by coloring $v$ with a color in $C$ is good or already know to be solvable. 
+
+Then, on Algorithm~\ref{alg:naive-cojecture-holds}, we are able to verify if there no unsolvable bad configurations on given a complete cubic tree
+by calling iteratively Algorithm~\ref{alg:naive-replacements} passing the new solvable configurations found on the previous step together with the previous already know solvables.
+The algorithm stops 
+when there aren't any unsolvable bad configuration left, or
+when no more solvable configurations are found, since, in this case, any new call to Algorithm~\ref{alg:naive-replacements} produces the same result as there are no new know solvable configurations.
+
+\begin{algorithm}
+\caption{ClassifySolvable}\label{alg:naive-replacements}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+def ClassifySolvable(T, bads, knownSolvablesOrGood):
+    replacementsCandidates = []
+    for badConf in bads: 
+        for i in range(len(badConf)):
+            color = badConf[i]
+            siblingColor = GetSiblingColor(badConf,i) 
+            newColorsToTest = CH.vertices() - CH.neighbors(siblingColor) - [color] - |$B_1$|
+            C = []
+            for newColorToTest in newColorsToTest:
+                badConf[i] = newColorToTest
+                if(badConf in knownSolvablesOrGood):
+                    C.append(newColorToTest)
+                    continue
+                fc, rc  = CalculateCosts(T, badConf)
+                if(fc != |$\infty$| and fc < rc):
+                    C.append(newColorToTest)
+            badConf[i] = color
+            if(len(C) != 0):
+                replacementsCandidates.append((badConf, i, C))
+    solvableBads, unsolvableBads = [], []
+    for (badConf, i, C) in replacementsCandidates: 
+        if(CheckReplacement(badConf[i], C)):
+            solvableBads.append(badConf)
+        else:
+            unsolvableBads.append(badConf)
+    return solvableBads, unsolvableBads
+\end{minted}
+\end{algorithm}
+
+
+TODO: Mover para definicao no capitulo 2 !
+\begin{algorithm}
+\caption{CheckReplacement}\label{alg:naive-replacements:check}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+def CheckReplacement(c_0, C, maxLevel=3):
+    T = CreateTreeForLevel(level)
+    for conf in product(list(range(0,16)), repeat = pow(2, maxLevel)):
+        minimalc_0Cost = MinCostWithRoots(T, conf, c_0)
+        if(minimalc_0Cost == |$\infty$|):
+           continue  
+        if(minimalc_0Cost < MinCostWithRoots(T, conf, C)):
+            return False 
+    return True
+
+def MinCostWithRoots(T, conf, possibleRoots):
+    if len(conf) == 1:
+        if(conf[0] in possibleRoots):
+            return 0
+        else:
+            return |$\infty$|
+    mincost = |$\infty$|
+    for confp in ParentConfigurations(T, conf):
+        pcost = MinCostWithRoots(T, confp, possibleRoots)
+        mincost = min(mincost, pcost)
+    return mincost + sum([i for c in conf if c in |$B_1$|])
+\end{minted}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{ConjectureHolds}\label{alg:naive-cojecture-holds}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos, breaklines, escapeinside=||,mathescape=true]{python}
+def ConjectureHolds(T):
+    unsolvedBads = GenerateBadConfs(T)
+    knownSolvables = []
+    while(unsolvedBads > 0):
+        newSolvableBads, newUnsolvedBads = ClassifySolvable(T, unsolvedBads, knownSolvables)
+        if(len(newUnsolvedBads) == len(unsolvedBads)):
+            break
+        unsolvedBads = newUnsolvedBads 
+        knownSolvables.extend(newSolvableBads)
+    return unsolvedBads == 0
+\end{minted}
+\end{algorithm}
+
+\subsubsection{Complexity}
+
+
+The algorithm described in this chapter has clearly an exponential behavior.
+Thus, for completeness, we present a brief complexity analysis of its worst-case scenario.
+This analysis also motivates the optimizations presented in Section~\ref{sec:signatures}. 
+The algorithm traverses all the $16 ^{|L(T)|}$ possible configurations of $T$.
+For each such configuration, it calls CalculateCosts which calls it self recursively for each of its parents configurations. 
+Each father can be colored with at most five colors (this happens when all children are colored with the same color),
+and hence the number of parents configurations is at most \(5^p\),
+where \(p\) is the number of parents (which vary corresponding to the level of the tree).
+% It finds the parents configurations by seeing, for each sibling pair or triple on the root's children, which colors can color the leaf's parents such that it is adjacent to all colors of its children.
+% In the binary case, we have 3 distinct possibilities: 5 colors if both siblings are colored the same(recall that \ch~is 5-regular), 2 if the siblings are colored withall non distinct non adjacent colors and 0 on the remaining case. 
+% In the root case, all possibilities remain and there is also the case of only one color choice for the root. 
+% Therefore CalculateCosts calls it self $O(5^{\frac{L(T)}{2}})$ times.
+Therefore in the worst-case scenario, the number of steps performed is at most \[16^{|L(T)|}\cdot 5^{\frac{|L(T)|}{2}}\cdot 5^{\frac{|L(T)|}{4}} \cdot \cdots \cdot 1\leq \big(16 \cdot 5^{\frac{1}{2} + \frac{1}{4} + \cdots } \big)^{|L(T)|} \leq 80^{|L(T)|}.\]
+
+\section{Signatures}\label{sec:signatures}
+First, in order to reduce the computer effort of testing all such configurations, we present one of the optimizations we used. 
+More precisely, we define the \emph{signature} of a configuration,
+which defines equivalence classes between the configurations.
+
+\newcommand{\p}{{\rm p}}
+Let \(T\) be a complete tree rooted on a vertex \(r\).
+We say that a vertex \(v\) is a \emph{child} of a vertex \(u\)
+if \(v\) is a neighbor of \(u\) that is not in the (unique) path from \(u\) to \(r\).
+Equivalently, we say that \(u\) is the \emph{father} of \(v\),
+and we write \(\p(v)\) for the father of a vertex \(v \neq r\),
+and \(children(u)\) for the set of children of \(u\).
+In this work, we consider orderings \(children(u)\),
+and we write \(children(u) = (x_1,\dots,x_n)\) as an ordered set.
+Given such an ordering
+\(children(u) = (x_1,\dots,x_n)\), we write \(x_{i} < x_{i+1}\) for all $1 \leq i < n$.
+Note that the union of these orders over the set of vertices of~\(T\)
+yields a partial order of the vertices of \(T\).
+Such a union of orderings is called \emph{children ordering}.
+This order can be naturally extended to a total order of each level of the tree by setting that if \(u < v\), then \(x < y\) for every \(x\in children(u)\) and \(y\in children(v)\),
+and this consequently yields a total order of the leaves of \(T\).
+
+
+% Observe that, by definition, if \(v\in L(T)\), 
+% then $ldf(v)~=~\{v\}$.
+% Equivalently, \(ldf(v)\) consists of the leaves of the (tree) component of \(T-vv^p\) that contains~\(v\).
+% %
+% % Given an internal vertex \(v\),
+% % let \(v^p\) be the vertex for which \(v\in children(v^p)\).
+% % We define the \emph{leaves of} \(v\)
+% % as the leaves of the (tree) component of \(T-vv^p\) that contains~\(v\).
+% In the case \(v = r\), we have \(ldf(v) = L(T)\).
+% We also assume that the \(ldf(v)\) inherit the total order of \(L(T)\) for every \(v\in V(T)\).
+
+% Now, let \(x_1,\ldots, x_\ell\) be the leaves of \(T\)
+% ordered as above.
+% Let $V_\ell$ be the vertices at distance $\ell$ of $r$,
+% the \emph{descendant leaves} of a vertex $v$ be all leafs of $T$ with $v$ within it's unique path to $r$,
+% \(conf\) a feasible configuration on \(T\),
+% and fix a children ordering~\(o\).
+% We consider a coloring \(c_o\) of the internal vertices of \(T\) with sequences of colors as follows.
+% Let \(x\in V(T) \setminus L(T)\) an internal vertex, and let \(y_1,\ldots, y_k\) be the (ordered) descendant leaves of \(x\).
+% We then set \(c_o(x) = \big(conf(y_1),\ldots,conf(y_k)\big)\).
+% % Such a coloring \(c_o\) is called the \emph{ordered coloring} of \(x\) 
+% % induced by \(conf\).
+% Observe that if \(T\) has height \(\ell\),
+% and \(x\in V_s\), then \(c_o(x) \in V(CH)^{\ell - s}\).
+% Consequently, if \(r\) is the root of \(T\),
+% then \(c_o(r) \in V(CH)^\ell\).
+
+\newcommand{\sign}{{\rm sign}}
+
+Now, fix a children ordering \(o\).
+We consider a partial order on sequences of colors as follows.
+Let \(u, v, w\in V(T)\) be such that \(v, w \in children(u)\).
+If \(v\) and \(w\) are leaves of \(T\), 
+then we write \(c_o(v) < c_o(w)\) if \(conf(v) < conf(w)\) and \(c_o(v) \geq c_o(w)\) otherwise.
+If \(v\) and \(w\) are internal vertices of \(T\),
+with \(children(v) = (x_1, \dots, x_n)\) and \(children(w) = (y_1,\dots,y_n)\),
+then we write \(c_o(v) < c_o(w)\) 
+if for the minimum \(i\) with $1\leq i \leq n$ such that $c_o(x_i) \neq c_o(y_i)$, we have \(c_o(x_i) < c_o(y_i)\);
+and $c_o(v) = c_o(w)$ if for every $i$ with $1\leq i \leq n$ we have \(c_o(x_i) = c_o(y_i)\);
+and \(c_o(v) > c_o(w)\) otherwise.
+Then \(\leq\) and \(\geq\) are defined as usual.
+% This ordering is a recursive lexicographic ordering.
+% Naturally, we write \(c_o(v) = c_o(w)\) if \(c_o(x_1) = c_o(y_1)\) and \(c_o(x_2) = c_o(y_2)\),
+% and we write \(c_o(v) \leq c_o(w)\) if either \(c_o(v) = c_o(w)\) or \(c_o(v) < c_o(w)\).
+Finally, we say that \(c_o(r)\) is \emph{recursively lexicographically ordered} (with respect to the fixed children ordering above), if for every \(u,v,w\in V(T)\) with \(v,w\in children(u)\) and \(v < w \), we have \(c_o(v)\leq c_o(w)\).
+
+
+TODO USAR [n] !
+
+% Observe that the order on the children order fixed above may always be modified
+% to yield an order for which \(conf\) is recursively lexicographic ordered.
+Observe that given a configuration \(conf\) there is a children ordering \(o^*\) in which~\(c_{o^*}(r)\) is recursively lexicographically ordered.
+Indeed, from any children ordering \(o\),
+starting with $u=r$, we sort \(children(u) = (x_1, \dots,x_n)\) with respect to \(c_o\)
+after sorting \(children(x_i)\) for each \(i\in [n]\),
+in a recursive fashion (see Algorithm~\ref{alg:signature} for the implementation for cubics and binary trees).
+% where \(c_o\) is updated after each such sorting.
+The \emph{signature} \(sign(conf)\) of a configuration \(conf\) is then defined to be the sequence \(c_{o^*}(r)\). 
+% and in Algorithm~\ref{alg:signature} we show how to compute the signature of any configuration of a cubic or binary tree.
+We naturally say that $sign(conf)$ is \emph{feasible} if $conf$ is feasible and unfeasible otherwise,
+the next lemma comes naturally.
+
+ \begin{lemma}\label{lemma:sig-and-conf-costs}
+    Let \(conf_1\) and \(conf_2\) be two feasible configurations.
+    If \(\sign(conf_1) = \sign(conf_2)\),
+    then \(RC(conf_1) = RC(conf_2)\) and \(FC(conf_1) = FC(conf_2)\).
+ \end{lemma}
+ \begin{proof}
+     % $c_1$ and $c_2$ can be ordered to it is signature 
+     % ....
+ \end{proof}
+
+\begin{algorithm}
+\caption{Signature(conf)}\label{alg:signature}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+def Flatten(t):
+    return reduce(add,map(Flatten, t)) if isinstance(t, (tuple,list)) else [t]
+
+def Signature(conf): 
+    flattenedConf = Flatten(conf)
+    size = len(flattenedConf)
+
+    T = GetTree(conf)
+    #if we are at level 1, the canonical representative is a simple 
+    #sorting of the vertices 
+    if(size <= 3):
+        return sorted(flattenedConf)
+    # in this case, we have a cubic tree
+    # we divide the list into three slices and recurse 
+    if(size%3 ==0):
+        thirdsize = size//3
+        p1 = Signature(flattenedConf[:thirdsize])
+        p2 = Signature(flattenedConf[thirdsize: thirdsize*2]) #l
+        p3 = Signature(flattenedConf[thirdsize*2 :]) #l
+        # default python sorting is lexicographical
+        return flatten(sorted([p1,p2,p3]))
+    # thus we have a configuration of a binary tree 
+    p1 = Signature(flattenedConf[:size/2])
+    p2 = Signature(flattenedConf[size/2:]) #l
+    if(p1 < p2):
+        return p1 + p2
+    return p2 + p1
+
+
+\end{minted}
+\end{algorithm}
+
+% Let $c_1$ be a configuration on $T_1$ and $c_2$ a configuration on $T_2 \subset T_1$, we say that $c_1$ is $c_2$-descendent if there is an homomorphism $h: T_1 \to H$ such that $h|_{V(T_1)}$ = $c_1$ and $h|_{V(T_2)}$ = $c_2$.
+
+% contando assinaturas
+% supondo que cada assinatura tem comprimento 2^k
+% se k = 1, então estamos falando de dois filhos f1, f2 do mesmo pai
+% cada filho, a princípio, pode ser colorido com 16 cores
+% há três opções de desigualdes para f1 x f2: (a) f1 < f2, (b) f1 == f2, (c) f1 > f2
+% observe que das 16^2 colorações de (f1,f2), temos que o número de colorações do tipo (a) é igual ao número de colorações do tipo (c), escrevemos |(a)| = |(c)|.
+% há também apenas 16 colorações do tipo (b).
+% as assinaturas correspondem precisamente às do tipo (a) ou (b)
+% logo o número de assinaturas para k=1 é (16^2 - 16)/2 + 16 = (16^2 + 16)/2 = 17*16/2 = 17*8
+
+% se k=2, então cada filho possui 17*8 opções de "cores".
+% usando o mesmo argumento, temos ((17*8)^2 - 17*8)/2 + 17*8 = ((17*8)^2 + 17*8)/2 = 137*136/2
+
+% em geral, temos a seguinte recorrência #ass_k = (#ass_{k-1}+1)(#ass_{k-1})/2 = {#ass_{k-1}+1 \choose 2}
+
+% na verdade, quando olhamos para dois irmãos f1,f2, ou eles têm a mesma cor, ou eles têm cores não adjacentes. Como o grafo de Clebsch é 5-regular e tem 16 vértices, o número de pares não adjacentes é 80 (o complemento de Clebsch é 10-regular, e portanto possui 16*10/2 arestas). Logo há 96 formas de colorir dois irmãos
+
+% número de configurações viáveis (16*16) + (16 * 80) + (80 * 16) + (80 * 79)
+% ((16*16) + (16 * 80) + (80 * 16) + (80 * 79) + 96)/2
+% ((16*16) + (16 * 80) + (80 * 16) + (80^2 -80) + 96)/2
+% (96^2 +16)/2
+% será (?^2 + 16)/2
+% em que ? = 16, 96 = 16*6,  
+
+\subsubsection{Counting signatures}
+
+
+% Although such observation motivates a recursive algorithm,
+% this can be achieved through a top-down simpler algorithm (see Algorithm~\ref{alg:...}).
+
+% and hence
+
+% {\color{red}It is easy to see that a configuration has a good parents configuration if and only if it is also a good configuration. }
+% Consequently, any feasible bad configuration of a tree of height at least 1 has at least one bad parents configuration.  
+% Therefore, to find all bad configurations of a tree \(T\) with height at least 1, 
+% it suffices to classify the children configurations of the bad configurations of \(T^{(1)}\) (see Algorithm~\ref{alg:...}). 
+
+% Note that, if a configuration $conf$ on a tree rooted in $r$ has no completion that maps $r$ into a color in $B_1$, then $conf$ is trivially good because \(RC(conf) = \infty\).
+% Therefore, in order to show that all configurations on given tree $T$ are good or solvable, it suffices to show that all configurations with a completion that maps \(r\) to $B_1$ are good or solvable. 
+% Since every such bad configuration has at least one bad parents configuration, to find all bad configurations of a tree \(T\) with height at least 2, 
+% it suffices to classify the children configurations of the bad configurations of \(T^{(1)}\) (see Algorithm~\ref{alg:...}). 
+% To illustrate this procedure, we present the following pseudocode with a Python like sintax (see Algorithm~\ref{alg:...}).
+
+Let $T$ be a tree and $conf$ a configuration on $T$.
+Given an internal vertex \(v\) of \(T\), we denote by $pc(conf,v)$ the set of colors that $v$ can be mapped by a completion of $conf$,
+i.e., $pc(conf,v) = \{ h(v) : h \text{ is a completion of } conf\}$.
+Naturally, the set \(pc(conf,v)\) is called the \emph{possible colors} of \(v\) with respect to \(conf\).
+In the specific case where \(v = r\) is the root of \(T\), 
+we write $pr(conf) = pc(conf,r)$.
+Note that if \(conf\) is not feasible, then \(pr(conf) = \emptyset\).
+On the other hand, if \(conf\) is feasible,
+then \(|pr(conf)| \geq 2\) because any pair of vertices of \(\ch\)
+that have a common neighbor, have at least two common neighbors.
+Then, we say that \(conf\) is \emph{special} if $|pr(conf)| = 2$.
+In particular, if \(conf\) is a special configuration,
+then \(pr(conf)\) consists of two nonadjacent vertices of \(\ch\).
+% Let's first estimate the number of signatures ...
+
+% Suppose that there is a special 
+% Let a \emph{special configuration} $sconf$ be any configuration on a tree $T$ rooted in $r$ such that $|pr(sconf)| = 2$.
+
+Now, denote by $FS(l)$ the number of feasible signatures of a complete binary tree of height $l$ and let $SC(l)$ be the number signatures of special configurations $T$.
+A simple computation give us $FS(0) = 16$ and $FS(1) = 96$. 
+The following result allows us to calculate these parameters recursively. 
+
+\begin{lemma} 
+If \(l > 1\), then 
+\[ 
+FS(l) = \binom{FS(l-1)}{2} + FS(l-1) - \frac{SC(l-1)^{2}}{160}.
+\]
+\end{lemma}
+\begin{proof}
+First, note that if \(sign = (c_1,\ldots, c_{2^l})\) is a feasible signature of a tree of height~\(l\),
+then \(sign_1 = (c_1,\ldots, c_{2^{l-1}})\)
+and \(sign_2 = (c_{2^{l-1}+1},\ldots,c_{2^l})\)
+are feasible signatures of a tree of height \(l-1\),
+where \(sign_1 \leq sign_2\).
+
+Now, let \(sign_1 = (c_1,\ldots, c_{2^{l-1}})\)
+and \(sign_2 = (c_{2^{l-1}+1},\ldots,c_{2^l})\)
+be two feasible signatures of a tree of height \(l-1\)
+such that \(sign_1 \leq sign_2\).
+There are \(\binom{FS(l-1)}{2}\) choices of \(sign_1\) and \(sign_2\)
+where \(sign_1 < sign_2\),
+and \(FS(l-1)\) choices of \(sign_1\) and \(sign_2\), 
+where the \(sign_1 = sign_2\).
+Therefore, there are \(\binom{FS(l-1)}{2} + FS(l-1)\) choices for \(sign_1\) and \(sign_2\).
+
+Now, consider \(pr(sign_1)\) and \(pr(sign_2)\).
+If there is \(u_1\in pr(sign_1)\) and \(u_2\in pr(sign_2)\)
+such that \(u_1\) and \(u_2\) have at least one common neighbor \(u_0\) in \(\ch\),
+then \(sign = sign_1 + sign_2 = (c_1,\ldots, c_{2^l})\)
+is a feasible signature of a tree of height \(l\),
+and \(u_0 \in pr(sign)\).
+We claim that \(sign\) is not feasible only if \(sign_1\) and \(sign_2\) are special configurations.
+Indeed suppose, without loss of generality,
+that \(sign_1\) is not special,
+i.e., \(|pr(sign_1)| > 2\),
+and let \(u_1, u_2, u_3\) be distinct vertices in \(pr(sign_1)\),
+and let \(v_1, v_2\) be distinct nonadjacent vertices in \(pr(sign_2)\).
+By the definition of \(\ch\), if \(u_i\) and \(v_j\) have no common neighbor, then \(u_i\) and \(v_2\) are adjacent.
+Therefore, if no vertex in \(pr(sign_1)\) has a common neighbor
+with a vertex in \(pr(sign_2)\), then 
+\(v_1\) and \(v_2\) are adjacent to every vertex in \(pr(sign_1)\),
+and hence have at least three common neighbors,
+a contradiction to the definition of \(\ch\).
+
+Observe that $pr(sign)$ of any given special signature \(sign\) must be one of the 80 pairs of distinct nonadjacent vertices $\{u,v\}$ in $CH$. 
+By the symmetry of $CH$, different such pairs are the set of possible roots of the same number of special signatures. 
+Therefore each pair is the $pr$ of $\frac{SC(l)}{80}$ special signatures.  
+
+Now, we can count the number of unfeasible configurations of the form $sign_1+sign_2$.
+Let $sign_1$ and \(sign_2\) be special configurations.
+As observed, if $sign_1+sign_2$ is not feasible, then each vertex in $pr(sign_1)$ must be adjacent to each vertex in $pr(sign_2)$,
+and hence $pr(sign_1) \cup pr(sign_2)$ induce a $C_4$ in $CH$.
+By the definition of $CH$, any given pair $u_1$, $u_2$ of non adjacent vertices have precisely two common neighbors (which, since \(CH\) is triangle-free, must also be non-adjacent).
+First, we count the number \(x\) of pairs \((sign_1,sign_2)\) such that $pr(sign_1) \cup pr(sign_2)$ induce a $C_4$ in $CH$.
+Observe in this case, we always have \(sign_1 \neq sign_2\).
+Since the pairs counted in \(\binom{FS(l-1)}{2} + FS(l-1)\)
+consider only pairs \((sign_1,sign_2)\) with \(sign_1 \leq sign_2\),
+the desired number of unfeasible configurations is~\(x/2\).
+Now, fix \(sign_1\in SC(l-1)\).
+This defines $pr(sign_1)$,
+and hence defines $pr(sign_2)$ because each pair of nonadjacent vertices is in precisely one copy of \(C_4\) in \(CH\).
+Once defined $pr(sign_2)$, there are precisely $\frac{SC(l-1)}{80}$ possible choices for $sign_2$.
+Therefore, there are precisely \(\frac{SC(l-1)^2}{80}\) choices of \((sign_1,sign_2)\)
+for which \(pr(sign_1)\cup pr(sign_2)\) induce a \(C_4\) in \(CH\),
+and hence \(\frac{SC(l-1)^2}{160}\) unfeasible configurations of the form $sign_1+sign_2$
+with \(sign_1 \leq sign_2\) as desired.
+\end{proof}
+
+
+%TODO trocar todos os "we know" por algo que faça sentido. "we have"
+Similar arguments may yield a precise formulae for the number of feasible signatures of cubic trees,
+but due to the length and technicality of these arguments, we only present the following estimate.
+
+\begin{lemma}
+    If \(l > 1\), then 
+\(
+FS_c(l) \leq FS_b(l-1)^3
+\).
+\end{lemma}
+
+
+\section{A Less Naive Algorithm}\label{sec:less-naive-algo} % escolher um melhor título para esta seção
+In this section, we introduce a few optimizations implemented on the algorithms presented so far. %ou "in Section~\ref{}".
+Note that that Algorithm~\ref{alg:naive-bottom-up} (\texttt{GenerateBadConfs}) can be easily optimized using signatures (see Section~\ref{sec:signatures}), 
+since it calls Algorithm~\ref{alg:naive-bottom-up:costs} (\texttt{CalculateCosts}) to obtain the free and restricted costs for multiple configurations that may have the same signature, 
+and configurations with the same signature have equal costs (see~Lemma~\ref{lemma:sig-and-conf-costs}).
+
+Todo: \big(sig, (fc,rc)\big) 
+TODO: Mudar tudo para referência a algo quando pertinente 
+We use a dictionary \texttt{signatures} whose keys are the signatures of the configurations seen,
+and whose values are the pairs \texttt{(fc,rc)} of corresponding costs.
+Then we modify Algorithm~\ref{alg:naive-bottom-up} (\texttt{GenerateBadConfs}) to check whether the signature \texttt{sig} of \texttt{conf} belongs to \texttt{signatures}.
+If \texttt{sig} belongs to \texttt{signatures}, we may immediately return \texttt{fc} and \texttt{rc};
+while if does not belong to \texttt{signatures}, we call Algorithm~\ref{alg:naive-bottom-up:costs} (\texttt{CalculateCosts}) to calculate the costs \texttt{fc} and \texttt{rc} of \texttt{conf},
+and insert \texttt{\big(sig, (fc,rc)\big)} in \texttt{signatures}.
+For the lookup of a signature \texttt{sign} to be efficient, we use a dictionary (hash table) 
+whose search operation has expected cost of $O(|\texttt{sign}|)$.
+Alternatively, we could use a balanced binary search tree or a prefix tree~\cite[Section 6.3: Digital Searching]{knuth1973art}.
+Analogously, the same pruning strategy can be used inside Algorithm~\ref{alg:naive-bottom-up:costs} (\texttt{CalculateCosts}) see Algorithm \ref{alg:opt-top-down:costs}) to reduce its recursive calls. 
+
+\begin{algorithm}
+\caption{Optimized version of \texttt{CalculateCosts}}\label{alg:opt-top-down:costs}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+def CalculateCostsOptimized(T, sig, signaturesCosts):
+    if len(sig) == 1:
+        if(sig[0] in |$B_1$|):
+            return 1,1
+        else:
+            return 0, |$\infty$|
+    #respectively the min parent free cost and the min parent restricted cos
+    minpfc, minprc = |$\infty$|, |$\infty$| 
+    levelcost = sum([1 for x in sig if x in |$B_1$|])
+    for sigp in ParentConfigurations(T, sig):
+        if(sigp in signaturesCosts):
+            pfc, prc  = signaturesCosts[sigp]
+        else:
+            pfc, prc  = CalculateCostsOptimized(|$T^{(1)}$|, sigp, signatureCosts)
+            signaturesCosts[sigp] = pfc, prc
+        minpfc, minprc = min(minpfc, pfc), min(minprc, prc)
+    return minpfc + levelcost, minprc + levelcost
+\end{minted}
+\end{algorithm}
+
+TODO: CHECK REFERENCES to \ref{alg:naive-botom-up:costs} !!!!!!!
+
+Since Algorithm~\ref{alg:naive-bottom-up} (\texttt{NOME DO ALGORITMO AQUI}) aims returning the set of bad configurations, 
+we would like to avoid calling Algorithm~\ref{alg:naive-bottom-up:costs} (\texttt{CalculateCosts}) for any configuration that we could preemptively know to be good or unfeasible. 
+For that, we use an iterator that avoids a subset of these configurations as follows.
+Recall that by Lemma~\ref{lemma:child-costs} a bad configuration necessarily has at least one bad parents configuration.
+% Therefore, to generate all bad configurations of a tree $T$, we only need to generate the children configurations of the bad configurations of $T^{(1)}$. 
+Thus, to generate the bad configurations of \(T\), 
+we can iterate over only the child configurations of the bad configurations of $T^{(1)}$. 
+This avoids unfeasible configurations and configurations for which all parents configurations are good. 
+Note also that we can extend this process for obtaining the bad configurations of $T^{(i)}$ from $T^{(i+1)}$ for any \(1 < i < h\) until we reach the trivial case of the single root as discussed in section~\ref{sec:naive-algo} (see~Algorithm~\ref{alg:opt-top-down}).
+
+
+\begin{algorithm}
+\caption{Optimized version of \texttt{GenerateBadConfs}}\label{alg:opt-top-down}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+def GenerateBadConfsOptimized(maxLevel):
+    bads = []
+    for b in |$B_1$|:
+        bads.append([b])
+    costs = {}
+    for level in range(1, maxLevel+1):
+        newBads = []
+        T = CreateTreeForLevel(level)
+        for badConf in bads:
+            for childConf in Children(badConf): 
+                sig = Signature(childrenConf)
+                if(sig in costs): 
+                    continue 
+                fc, rc = CalculateCostsOptimized(T, sig, costs) 
+                costs[sig] = fc, rc
+                if(fc != |$\infty$| and fc == rc):
+                    newBads.append(sig)
+        bads = newBads
+    return bads 
+\end{minted}
+\end{algorithm}
+
+The use of signatures can be extended to the whole procedure.
+For example,  we can reduce the number of iterations of Algorithm~\ref{alg:naive-cojecture-holds} (\texttt{ConjectureHolds}) by iterating only over the signatures of the bad configurations, instead of over all bad configurations.
+For that, Algorithm~\ref{alg:opt-top-down} returns simply the signatures of the bad configurations.
+We can also use signatures to reduce the number of calls to Algorithm~\ref{alg:naive-bottom-up:costs} (\texttt{CalculateCost}) made by Algorithm~\ref{alg:naive-replacements} (\texttt{ClassifySolvable}).
+Algorithm~\ref{alg:opt-cojecture-holds} implements the modification made on Algorithm~\ref{alg:naive-cojecture-holds}.
+It remains to further improve Algorithm~\ref{alg:naive-replacements} (\texttt{ClassifySolvable}).
+
+
+\begin{algorithm}
+\caption{Optimized version of \texttt{ConjectureHolds}}\label{alg:opt-cojecture-holds}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos, breaklines, escapeinside=||,mathescape=true]{python}
+def ConjectureHoldsOptimized(maxLevel):
+    unsolvedBads = GenerateBadConfsOptimized(maxLevel)
+    knownSolvables = []ConjectureHolds
+    while(unsolvedBads > 0):
+        newSolvableBads, newUnsolvedBads = ClassifySolvable(T, unsolvedBads, knownSolvables)
+        if(len(newUnsolvedBads) == len(unsolvedBads)):
+            break
+        unsolvedBads = newUnsolvedBads 
+        knownSolvables.extend(newSolvableBads)
+    return unsolvedBads == 0
+\end{minted}
+\end{algorithm}
+
+
+Recall from Section~\ref{sec:replacements} that if a pair $(c_0, C)$ is a replacement, then every pair formed by $c_0$ and a superset of $C$ is also a replacement.
+Thus we group the replacements candidates by creating a dictionary
+in which each key is a color \(c_0\) whose value is a list of sets \(C\)
+for which \((c_0,C)\) is a replacement.
+
+
+and note that we can group by $c_0$ every replacements candidate $c_0, C$, forming sets $C_{c_0}$ for each $c_0$, and, 
+then order each element $C_{c_0}^{i}$ in $C_{c_0}$ in relation to the number of other elements in $C_{c_0}$ which are subsets of $C_{c_0}^{i}$.
+Then we can verify if the replacements candidates $c_0, C_i$ are replacements in such order and, by consequence, optimally avoid to calculate unneeded replacements candidates formed by $c_0$ and supersets of $C$ such that $c_0, C$ is a replacement.
+This ordering can be achieved with a simple algorithm(See~\ref{temp}) in $O(s)^2$ where s is the number of replacements candidates with is computationally irrelevant compared to the effort to verify each replacement. 
+We then arrive at: 
+
+\begin{algorithm}
+\caption{ClassifySolvableOptimized}\label{alg:opt-replacements}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+def ClassifySolvableOptimized(T, bads, signaturesCosts, knownSolvablesOrGood, knownReplacements):
+    replacementsCandidates = []
+    for badConf in bads: 
+        for i in range(len(badConf)):
+            color = badConf[i]
+            siblingColor = GetSiblingColor(badConf,i) 
+            newColorsToTest = CH.vertices() - CH.neighbors(siblingColor) - [color] - |$B_1$|
+            C = []
+            for newColorToTest in newColorsToTest:
+                badConf[i] = newColorToTest
+                if(badConf in knownSolvablesOrGood):
+                    C.append(newColorToTest)
+                    continue
+                if(badConf in signaturesCosts):
+                    fc, rc  = signaturesCosts[badConf] 
+                else:
+                    fc, rc  = CalculateCosts(T, badConf)
+                    signaturesCosts[badConf] = fc, rc
+                if(fc != |$\infty$| and fc < rc):
+                    C.append(newColorToTest)
+            badConf[i] = color
+            if(len(C) != 0):
+                replacementsCandidates.append((badConf, i, C))
+    solvableBads, unsolvableBads = [], []
+    for (badConf, i, C) in SortReplacementCandidates(replacementsCandidates): 
+        if(CheckReplacement(badConf[i], C)):
+            solvableBads.append(badConf)
+        else:
+            unsolvableBads.append(badConf)
+    return solvableBads, unsolvableBads
+\end{minted}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{SortReplacementCandidates}\label{alg:sort-replacements-candidates}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+#TODO
+def SortReplacementCandidates(replacementsCandidates):
+    return 
+\end{minted}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{CalculateMinCostWithRoot}\label{alg:replacements:min-cost-with-root}
+\footnotesize
+\begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
+def CheckReplacement(badConf, index, subColors, maxLevel=3):
+    toTest = [badConf[i]]
+    for level in range(maxLevel):
+        newToTest = []
+        T = CreateBinaryTreeForLevel(level)
+        originalCosts = {}
+        replacementCosts = {}
+        for childConf in toTest.SelectMany(test => Children(test)): 
+            originalCost = MinCostWithRoots(T, childConf, possibleRoots, originalCosts)
+            replacementCost = MinCostWithRoots(T, childConf, possibleRoots, replacementCosts)
+            if(replacementCost == |$\infty$| or replacementCost > baseCost):
+                newToTest.append(childConf)
+        toTest = newToTest
+        if(len(newToTest) == 0):  
+            break
+    return len(toTest) == 0 
+
+def MinCostWithRoots(T, sig, possibleRoots, costsCache):
+    if len(sig) == 1:
+        if(sig[0] in possibleRoots):
+            return 0
+        else:
+            return |$\infty$|
+    cost = |$\infty$|
+    for sig_p in ParentConfigurations(T,sig):
+        if(sig_p in costsCache):
+            pcost  = signaturesCosts[confp]
+        else:
+            pcost = CalculateMinCostWithRoot(T, sig, costsCache)
+            costsCache[sig] = pcost
+        cost = min(cost, pcost)
+    return cost + sum([i for c in sig if c in |$B_1$|])
+\end{minted}
+\end{algorithm}
+
+
+\subsubsection{Complexity}
+
+\section{Conclusion}
+
+In addition to the optimizations introduced on Section~\ref{sec:less-naive-algo} and outside the scope of this work, we could use automorphisms between configurations to improve the definition of signatures. 
+This would allow the algorithm to skip more configurations.
+If the computing environment is multi-core, we could also divide the configurations onto multiple threads speeding up the total time needed to compute the final classification of the configurations. 
+
+
+In the next chapter, we introduce the results of equivalent c++ implementation of the pseudo-code presented on this chapter with $B_1=\{0\}$ over the clebsch graph and the degenerated form of the clebsch graph. 
+We can further improve \texttt{CheckReplacement} by organizing the replacements in order for which 
+Therefore we can cache the results of \texttt{CheckReplacement} and before we call the function for a pair $c_0, C$ we check if already have the results for this pair or if we already know that $c_0$ and subset of $C$ are a replacement. 
+

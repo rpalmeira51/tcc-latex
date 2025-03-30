@@ -1,0 +1,933 @@
+\chapter{Motivation and initial definitions}
+\label{chap2}
+\newcommand{\nesetril}{Ne{\v{s}}et{\v{r}}il}
+\newcommand{\devos}{DeVos}
+\newcommand{\samal}{{\v{S}}{\'a}mal}
+\newcommand{\bads}{{\rm Bads  }}
+\newcommand{\girth}{g}
+\newcommand{\dist}{{\rm dist}}
+\newcommand{\samal}{{\v{S}}{\'a}mal} 
+\newcommand{\cleb}{Clebsch graph}
+
+\newcommand{\cost}{{\rm cost}}
+
+\section{TODOS}
+\begin{itemize}
+\item Testar com o seguinte grafo de Clebsch modificado ao adicionarmos todas as arestas incidentes ao 0.
+\item Testar nível 4 com quadruplas 
+\item Remover referência a super grafo 
+\item Testar todas as quadruplas e calcular números de raizes possíveis 
+\item Adpatar a parte de replacements para Clebsch novamente e falar dos triviais 
+
+\item Prova de conceito
+\item Na seção de resultados falar que a técnica funciona pro supergrafo de Clebsch. Infelizmente, há um homomorfismo trivial para este grafo.
+
+\item Que condições a gente precisa pra essa estratégia funcionar? (1) que qualquer par de vértices com distância 2 tenha pelo menos dois vizinhos em comum.
+
+\item Perspectiva geral: recebemos um grafo cúbico que admite um homomorfismo a um grafo H, será que conseguimos evitar algum vértice adicionando uma condição na cintura de G?
+
+\end{itemize}
+
+\section{Definitions - Renomear e talvez mudar de lugar}
+In what follows, if \(m\) is a function \(m\colon A \to B\) and \(A'\subseteq A\),
+we denote by \(m|_{A'}\) the restriction of \(m\) to \(A'\),
+i.e., the function \(m|_{A'}\colon A' \to B\)
+such that \(m|_{A'}(x) = m(x)\) for every \(x\in A'\).
+
+Let \(T\) be a tree in a cubic graph \(G\).
+A vertex \(x\) such that \(d_T(x) = 1\) is called a \emph{leaf} of \(T\),
+otherwise \(x\) is called \emph{internal}.
+We say that \(T\) is \emph{cubic} if \(d_T(x)\in\{1,3\}\) for every vertex of \(T\).
+
+%TODO talvez queiramos isso para sequências de vértices.
+%TODO verificar se usamos apenas o conjunto de cores
+% Let $h$ be any homomorphism $h \colon G \to G'$ and $T \subseteq G$ a tree, we define $h(L(T))$ as the set $\{ h(x) : x \in L(T)\}$.
+
+Let $h$ be a homomorphism $h \colon G \to G'$ and \(S\) a tuple \((u_1,\ldots,u_s)\)  of vertices of \(G\). 
+We define $h(S)$ as the tuple \(\big(h(u_1),\ldots, h(u_s)\big)\).
+
+
+\section{The Pentagon Problem}
+\label{sec:the-pentagon-problem}
+
+This work is as study about the \emph{\nesetril{} Pentagon Problem} below. 
+
+
+% já definiu homorphism?
+% já definiu o C5?
+% Já definiu cubic graph?
+% já definiu cintura?
+\begin{conjecture}\label{conj:pentagon-problem}
+    There is a constant \(g_0\in \mathbb{N}\) for which the following holds.
+    If \(G\) is a cubic graph with girth at least \(g_0\),
+    then \(G\) has an homomorphism to $C_5$.
+\end{conjecture}
+
+% ``Let G be a cubic graph of sufficiently large girth, is it true that $Hom(G, C_5) \neq \emptyset$?''
+
+% já definiu "is homomorphic"?
+Conjecture~\ref{conj:pentagon-problem} was originally proposed in \nesetril{} problem sessions~(see \cite{nesetril1999aspects}). 
+By Brook's Theorem (see~\cite{brooktheorem} or~\cite[Theorem 5.2.4]{diestel2017graph}),
+every triange-free cubic graph has chromatic number at most \(3\),
+and hence is homomorphic to \(C_3\).
+% It's easy to see that for $C_3$ the problem is always true with $g>3$ using Brooks' theorem, since $C_3$ is a complete graph and $K_3$ it's the only complete \emph{3-regular} graph with girth 3.  
+On the other hand, \cite{HATAMI2005319} showed that Conjecture~\ref{conj:pentagon-problem} does not hold 
+if we replace \(C_5\) by \(C_\ell\) for any \(\ell>5\),
+i.e., that for every \(\ell\) and \(g\) there is a cubic graph of girth at least \(g\) that is not homomorphic to \(C_\ell\).
+Conjecture~\ref{conj:pentagon-problem} deals then with the reamining case of \(C_5\).
+% On the other hand, \cite{HATAMI2005319} showed that it's always false for $C_7$ and so, more generally, for every $C_n$ with $n > 5 $, as such $C_5$, showed in \ref{fig:c5}, is the only open homomorphism remaining. 
+
+\begin{figure}[h]
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \input{Imagens/C5}
+         \caption{The cycle $C_5$ of length $5$}
+         \label{fig:c5}
+     \end{subfigure}
+     \begin{subfigure}[b]{0.45\textwidth}
+         \centering
+         \input{Imagens/clebsch_graph}
+         \caption{The Clebsch Graph $\ch$}
+         \label{fig:clebsch_graph}
+     \end{subfigure}
+     % \caption{Left: the cycle $C_5$ of length $5$; Right: The Clebsch Graph $\ch$}
+     \caption{}
+     \label{}
+\end{figure}
+
+
+%TODO: checar todos os "a" versus "an"
+%TODO: Falar curiosidades e dar definições alternativas a respeito do grafo de Clebsch
+%TODO: por exemplo, o grafo de Clebsch é muito simétrico. Dado qual par de vértices u,v, sempre há um automorphismo que leva u em v, i.e., todos os vértices se parecem.
+%TODO: colocar uma segunda figura usando a notação de conjunto abaixo
+%TODO: apresentar a notação PQ_4
+
+\newcommand{\ch}{{CH}} 
+\newcommand{\chzero}{{CH_0}}
+\newcommand{\chone}{{CH_1}}
+In a computer-assisted proof, \cite{devos2011high} showed that every graph $G$ with $\Delta(G) \leq 3 $ and girth at least 17 has an homomorphism to the \emph{Clebsch graph}, which we define next. The Clebsch graph (see Figure~\ref{fig:clebsch_graph}) is the $5$-regular graph \(CH = (V_1 \cup V_2 \cup V_3, E)\), where
+$V_1 = \big\{ \{x\} : \text{ for all } x \in [5] \big\}$, $V_2= \big\{ \{x,y\} : \text{ for all } x, y \in [5] \text{ such that } x < y \big\}$, $V_3 = \big\{ \{ 1,2,3,4,5 \} \big\}$ and
+\[E = \big\{ XY : X \in V_1,\ Y \in V_2\cup V_3\text{ and } X \subseteq Y\big\} \cup \big\{ XY : X,\ Y \in V_2,\ X \cap Y = \emptyset  \big\}.\]
+
+
+
+%TODO: colocar também um enunciado simplificado do teorema de Devos e Samal
+%TODO: ...Na verdade, DEVOS E Samal provaram o seguinte teorema que lida com cut-complements (aí tem que definir cut-complement)
+%TODO: reescrever esse teorema com apenas as coisas que já foram apresentadas
+%TODO: não falar de PQ4 e não falar de cut complement
+% \begin{theorem}\label{thm:DevosSamal11}
+% Every graph of maximum degree 3 and girth at least 17 is homomorphic to $PQ_4$ (also known as the Clebsch graph), or equivalently has 5 disjoint cut complements. 
+% Furthermore, there is a linear time algorithm which computes the homomorphism and the cut complements.
+% \end{theorem}
+
+TODO comentar antes: "Furthermore, there is a linear-time algorithm which computes the
+homomorphism."
+
+\begin{theorem}[\devos--\samal]\label{thm:DevosSamal11}
+Every graph of maximum degree 3 and girth at least 17 is homomorphic to $\ch$.
+\end{theorem}
+
+TODO: Comentar que homomorfismos são colorações nas definições iniciais (de homomorfismo)
+TODO: Mais especificamente, um homomorfismo é uma coloração na qual proibimos algumas cores de aparecer em vértices adjacentes
+
+It's worth mentioning that the proof given by \cite{devos2011high} yields a linear-time algorithm to compute such a homomorphism.
+
+%TODO: falar que "It is then natural to consider other computer search methods in order to improve Theorem 2"
+
+
+\subsection{The Clebsch graph}\label{sec:clebsch}
+Throughout the text we refer to the vertices of \(\ch\) as $0, \ldots, 15$ as show in Figure~\ref{fig:clebsch_graph} and, to avoid confusion with the vertices of the considered cubic graphs, we refer to the vertices of \(\ch\) as \emph{colors}.
+Moreover, we often refer to homomorphims as colorings.
+%wrong label 
+A key observation with respect to the \(\ch\) that is used throughout the text is that every pair of (not necessarily distinct) vertices of \(\ch\) has either zero, two, or five common neighbors.
+\begin{fact}\label{fact:common_neighbors}
+    If \(u,v \in V(\ch)\), then \(|N(u)\cap N(v)| \in \{0,2,5\}\).
+\end{fact}
+
+
+
+% TODO falar em algum lugar da transitividade dos homomorfismos: se G -> H e H-> R, então G -> R
+
+% Observe ao removermos os vértices \(0,1,2,7,12\) do grafo de Clebsch, obtemos um grafo que admite um homomorfismo para o \(C_5\).
+% Assim, se há um homomorfismo de \(G\) ao grafo de Clebsch que evita tais vértices, há um homomorfismo de G para C_5.
+% Em particular, sejam V1,...,V5 as classes de um homomorfismo h^-: C^- = Clebsch-{0,1,2,7,12} -> C5, tais que os vértices de V_i são adjacentes apenas aos vértices de V_{i-1} e V_{i+1}, onde a soma nos índices é tomada módulo 5.
+% 
+We consider the possibility of building upon Theorem~\ref{thm:DevosSamal11} to get a stronger result towards Conjecture~\ref{conj:pentagon-problem} using the following simple observation:
+there is a set \(B\subseteq V(\ch)\) such that the graph obtained from \(\ch\) by removing the vertices in \(B\)
+is homomorphic to \(C_5\).
+Although there are several sets with the property above, in this work we use the set \(B_0 = \{0,1,2,7,12\}\),
+which we call the set of \emph{undesired vertices},
+and we denote by \(\ch_0\) the graph obtained from \(\ch\) by removing the vertices in \(B_0\).
+It's not hard to check that \(CH_0\) has a homomorphism \(h_0\) to $C_5$\footnote{For example pick the graph classes \{4, 8\}, \{9,10,14\}, \{6,11,15\}, \{3, 13\}, \{5\}},
+and hence, to solve Conjecture~\ref{conj:pentagon-problem}, it's enough to prove that there is a constant \(g_0\) such that every cubic graph with girth at least \(g_0\) has an homomorphism to \(CH_0\),
+i.e., an homomorphism to \(CH\) that avoids the vertices in \(B_0\).
+%
+The objective of this work is to explore computer search methods to 
+find a partial result in this direction.
+More specifically we want to find a minimum girth \(g_0\)
+for which all cubic graphs of girth at least $g_0$ have a homomorphism to 
+the graph \(\chone\) obtained from \(\ch\) by removing a non-empty subset $B_1 \subseteq B_0$. 
+
+TODO uniformizar como comandos ch, ch0 e ch1
+
+For that we establish a theoretical framework for dealing with local recolorings that try to avoid undesired colors.
+% More specifically, if \(G\) is a cubic graph with girth at least \(17\),
+% by Theorem~\ref{thm:DevosSamal11}, there is an homomorphism \(h \colon G \to C_5\).
+% If \(h(u) \notin \bads\) for every \(u\in V(G)\), then we are done.
+% Otherwise, if \(h(u) \in \bads\),
+% then the subgraph of \(G\) induced by the vertices with distance at most \((g(G)-1)/2\) from \(u\)
+% is a tree.
+%
+% to characterize subgraphs of any subcubic graph of girth at least $g$ with respect to locally removing undesired vertices of a given homomorphism. 
+%
+% We show that 
+% there always is a homomorphism excluding the undesired vertices 
+% if there is $g$ such that, for any homomorphism of a subcubic graph of girth at least $g$ that takes a vertex to an undesired vertex, 
+% we are able to show that there is a subgraph such that we are able to locally remove the undesired vertex. 
+%
+%
+We use this framework to prove the trivial result that we can always remove one of the undesired vertices from any homomorphism from a cubic graph of girth at least $17$ to a degenerate form of Clebsch graph that contains a few triangles. Furthermore, we try unsuccessfully to use it to remove a color from any homomorphism from a cubic graph of girth at least $g$ to the Clebsch graph,
+and present some statistical results regarding the number of \emph{configurations} (see Section~\ref{sec:configurations})
+that can be ``improved'' using this method.
+On the other hand, we present an infinite family of configurations that, independently of the girth, cannot be locally improved (see Section~\ref{sec:universal-bad-configurations}).
+This proves the non-effectiveness of this method.
+
+% We then show that the result is impossible given the nature of Clebsch graph's symmetry.
+% There is a way of always constructing an arbitrarily large subgraph that cannot be locally improved. Finally, we speculate the use of this construction to prove that Conjecture \ref{conj:pentagon-problem} as false and we also introduce another framework for trying to prove it true with computer assistance. 
+In this work, we use this framework to recolor the extended neighborhood of a vertex,
+that due to the high girth condition, is isomorphic to a tree.
+This framework can be further used to explore different subgraphs as, 
+for example, cycles, for which it is still not clear if the above intrinsically bad configurations also provide obstructions.
+
+
+\section{Theoretical foundation}
+
+% TODOS
+% 1) definir 
+% - árvore cúbica: graus apenas 1 e 3 
+% - binária semicompleta: raiz tem grau 2, mas todos os vértices têm grau 1 e 3
+% - binária completa (de altura h): há precisamente 2^i vértice no nível i (i=0,1,...,h)
+% 2) dar um jeito de definir compatible de forma geral (que não seja apenas para cúbica)
+
+Let \(G\) be a subcubic graph, and let \(h\) be a homomorphism $G \to CH$.
+We define the \emph{cost} of $h$ as 
+\[\cost(h)~=~|\{x : \text{ for all } x \in V(G) \text{ and } h(x) \in B_1 \}|.\] 
+Observe that if \(\cost(h) = 0\), then \(h\) avoids the vertices in \(B_1\),
+and hence, as observed in Section~\ref{sec:the-pentagon-problem},
+\(h\) is a homomorphism from $G$ to $\chone$.
+
+
+Now, let \(G\) be a cubic graph,
+let \(T\subseteq G\) be a cubic tree,
+and suppose that there is a homomorphism \(h \colon G \to \ch\).
+We say that an homomorphism \(h' \colon T \to \ch\) is \(h\)-\emph{compatible} if \(h'|_{L(T)} = h|_{L(T)}\),
+i.e., if \(h'(x) = h(x)\) for every \(x\in L(T)\),
+and we define the \((h,h')\)-\emph{modified} map $h^* \colon G \to \ch$ by
+\[ 
+h^*(v) = 
+     \begin{cases}
+       h'(v) &\quad\text{if } v\in V(T)\\
+       h(v) &\quad\text{if } v\notin V(T)
+     \end{cases}
+\]
+
+By the definition of \(h\)-compatible, 
+if \(d_T(u) = d_G(u)\) for every vertex of \(T\) that is not a leaf, 
+then $h^*$ is a homomorphism from \(G\) to \(CH\).
+Indeed, let \(uv\in E(G)\). 
+If \(uv\in E(T)\), then \(h'(u)h'(v) \in E(CH)\) because \(h'\) is a homomorphism from \(T\) to \(CH\).
+Now, suppose that \(uv\notin E(T)\).
+If both $u$ and $v$ are in $V(G) \setminus V(T)$ we have $h^*(u)h^*(v) = h(u)h(v)$ which in $E(CH)$ because \(h\) is is a homomorphism from \(G\) to \(CH\).
+If $u \in V(T)$ and $v \in V(G) \setminus V(T)$, then $u$ is a leaf of $T$.
+By the definition of \(h\)-compatible we have $h'(u) = h(u)$ and hence $h^*(u)h^*(v) = h(u)h(v)$ which is in \(E(CH)\) because \(h\) is is a homomorphism from \(G\) to \(CH\).
+
+%Definição alternativa de custo
+%Now, let \(G'\) be a subgraph of \(G\), 
+%and let \(m\colon V(G')\to V(H)\).
+%We define the \(\cost(m)\) as the number of elements of \(V(G')\) mapped to $0$,
+%i.e., the size of \(\{x\in V(G') : m(x) = 0\}\).
+The following lemma comes naturally.
+
+\begin{lemma}\label{lemma:cost-improvement}
+    Let \(G\) be a cubic graph for which there is an homomorphism \(h\) from \(G\) to \(CH\), let $T \subseteq G$ a cubic tree, $h'$ a $h$-compatible homomorphism from $T$ to $CH$,
+    and let \(h^*\) be the \((h,h')\)-modified homomorphism,
+    then \[\cost(h^*) = \cost(h) - \cost(h|_T) + \cost(h').\]
+\end{lemma}
+
+% Similarly, if both $u$ and $v$ are in $G \setminus T$ we have $(h_1(u), h_1(v)) = (c(u), c(v)) $ which by definition is in $E(H)$. If $u \in T$ and $v \in G \setminus T$ we have that necessarily u is a leaf of $T$ and therefore, by the definition of \(c\)-\(\compatible\), $ c_2(u) = c(u)$ and $(h_1(u), h_1(v)) = (c(u), c(v)) $ which by definition is in $E(H)$. 
+% We also have that : 
+%%%USAR ALIGN AQUI
+% $$
+% cost(h_1) = | \{x\in V(G) : h_1(x)\in\bads\} | 
+% $$
+% \[= | \{x\in V(G \setminus T) : c(x)\in\bads\} | + | \{x\in V(T) : c_2(x)\in\bads\} | \]
+% \[= | \{x\in V(G) : c(x)\in\bads\} | -  |\{x\in V(T) : c(x)\in\bads\} | + cost(c_2) \]
+% \[= cost(c) - | \{x\in V( T) : c(x)\in\bads\} | + cost(c_2) \]
+% \[= cost(c) - cost(c|_T) + cost(c_2) \]
+\begin{proof}
+    \begin{align*}
+    \cost(h^*) 
+        & = | \{x\in V(G) : h^*(x)\in\bads\} | \\
+        & = | \{x\in V(G) \setminus V(T)) : h(x)\in\bads\} | + | \{x\in V(T) : h'(x)\in\bads\} | \\
+        & = | \{x\in V(G) : h(x)\in\bads\} | -  |\{x\in V(T) : h(x)\in\bads\} | + cost(h') \\
+        & = \cost(h) - | \{x\in V( T) : h(x)\in\bads\} | + cost(h') \\
+        & = \cost(h) - \cost(h|_T) + \cost(h') \qedhere
+    \end{align*}
+\end{proof}
+
+Now, suppose that \(h\) is a homomorphism from \(G\) to \(CH\) 
+that minimizes \(\cost(h)\).
+Let \(T\subseteq G\) be a cubic tree,
+and let \(h'\) be a \(h\)-compatible homomorphism of \(T\).
+%
+Consider the \((h,h')\)-modified homomorphism \(h^*\).
+If \(\cost(h') < \cost(h|_T)\), then \(h^*\)
+is a homomorphism of \(G\) in \(CH\) for which, by Lemma~\ref{lemma:cost-improvement}, we have \[\cost(h^*) = \cost(h) - \cost(h|_T) + \cost(h') < \cost(h),\]
+a contradiction to the minimality of \(h\).
+Therefore, for every cubic tree \(T\subseteq G\) there is no \(h\)-compatible homomorphism \(h'\) of \(T\) for which \(\cost(h') < \cost(h|_T)\).
+This yields the following lemma
+
+\begin{lemma}\label{lemma:there-is-no-improvement}
+Let \(G\) be a cubic graph with girth at least \(\girth{}\),
+and let \(h\) be a homomorphism from \(G\) to \(CH\) 
+that minimizes \(\cost(h)\).
+Now, let \(T\subseteq G\) be a cubic tree. 
+Then there is no \(h\)-compatible homomorphism \(h'\colon T \to CH\)
+such that \(\cost(h') < \cost(h|_T)\).
+\end{lemma}
+
+% In the following sections we attempt to proof the following conjecture.
+%In the following sections we explore the following conjecture.
+%Rename 
+
+The methods developed in this work mean to explore the following conjecture.
+\begin{conjecture}\label{conjecture:main-conjecture}
+Let \(G\) be a cubic graph with girth at least \(\girth{}\) for which there is an homomorphism \(h\) from \(G\) to \(CH\).
+If \(\cost(h) > 0\),
+then there is a cubic tree \(T\subseteq G\)
+and a \(h\)-compatible homomorphism \(h'\) from \(T\) to \(CH\)
+such that \(\cost(h') < \cost(h|_T)\).
+\end{conjecture}
+
+If Conjecture~\ref{conjecture:main-conjecture} holds,
+then if \(h\) is a homomorphism from \(G\) to \(CH\) 
+that minimizes \(\cost(h)\),
+then \(\cost(h) = 0\).
+Therefore, as a natural consequence of Lemma~\ref{lemma:cost-improvement} and Conjecture~\ref{conjecture:main-conjecture}, we have the following.
+
+%TODO: revisar isso quando checar se a prova funciona para H no lugar de H^+
+\begin{theorem}\label{thm:main}
+    % Suppose that Conjecture~\ref{conjecture:main-conjecture} holds.
+    % If \(G\) is a cubic graph of girth at least \(\girth\),
+    % then there is a homomorphism from $G\to CH_1$.
+% 
+    If Conjecture~\ref{conjecture:main-conjecture} holds,
+    then every cubic graphs with girth at least \(\girth\) has a homomorphism to \(\chone\).
+\end{theorem}
+
+\begin{proof}
+Let \(G\) be as in the statement.
+By Theorem~\ref{thm:DevosSamal11}, there is an homomorphism from \(G\) to \(CH\).
+Let \(h\) be an homomorphism from \(G\) to \(CH\) that minimizes \(\cost(h)\).
+Suppose \(\cost(h) > 0\). 
+If Conjecture~\ref{conjecture:main-conjecture} holds, then there is a cubic tree \(T\subseteq G\)
+and a \(h\)-compatible homomorphism \(h'\) from \(T\) to \(CH\)
+such that \(\cost(h') < \cost(h|_T)\).
+Now, let \(h^*\) be the \((h,h')\)-modified homomorphism from \(G\) to \(CH\).
+By Lemma~\ref{lemma:cost-improvement}, we have \(\cost(h^*) = \cost(h) - \cost(h|_T) + \cost(h') < \cost(h)\),
+a contradiction to the choice of \(h\).
+Therefore, we have \(\cost(h) = 0\), and hence \(h\) is a homomorphism from \(G\) to \(\chone\) as desired.
+\end{proof}
+
+
+\section{Replacements}\label{sec:replacements}
+
+%TODO: introduzir replacement. 
+%TODO: depois pensar onde vai esse parágrafo
+%TODO: se isso for pra depois de configuração, modificar a linguagem para já falar de configurações
+
+Suppose we explored a complete tree, and reached a coloring of its leaves that cannot be improved,
+but for which there is a coloring of its leaves that differ from the current coloring
+in only a few vertices that could be improved. 
+The concept of replacements are introduced as a way of exploring and modifying the tree from these problematic vertices,
+and hence exploring and modifying an unbalanced tree.
+
+Let \(T\) be a complete binary tree rooted in \(r\in V(T)\), 
+let \(c_0 \in V(CH)\) a color and \(C\subseteq V(CH_0) \setminus \{c_0\}\) a set of \emph{target} colors. 
+Given a homomorphism \(h\colon T\to CH\), an \((h,C)\)-\emph{associated homomorphism} is any homomorphism $ah \colon T \to CH$ such that 
+(i)~$ah(r) \in C$; 
+(ii)~$ah(L(T)) = h(L(T))$; and
+(iii)~$cost(ah) \leq cost(h)$.
+We call the pair $(c_0, C)$ a  \emph{replacement with respect to \(T\)} if for every homomorphism $h \colon T \to CH$ with $h(r) = c_0$, there is an \((h,C)\)-associated homomorphism $h^* \colon T \to CH$. 
+
+As an example, in what follows we present a simple family of replacements.
+Let \(c_0\) a color in \(\{0\}\cup N_\ch(0)\),
+and let \(C\) the set of colors (in \(\ch\)) nonadjacent to \(c_0\)  (see~Table~\ref{table:replacements-height-1}).
+We call \((c_0,C)\) a \emph{trivial replacement}.
+The following proposition arises.
+
+\begin{proposition}
+    Every trivial replacement is a replacement with respect to the binary tree with~height 1.
+    % $c_0$ and $C$ on Table~\ref{table:replacements-height-1} $(c_0, C)$ is a \emph{replacement with respect to \(T\)}
+\end{proposition}
+\begin{proof}
+Let \((c_0,C)\) be a trivial replacement.
+We prove that \((c_0,C)\) is a replacement with respect to the complete binary tree \(T\) of height \(1\).
+Indeed, let \(r\) be the root of \(T\) and \(l_1,l_2\) be its leaves,
+and let \(h \colon T \to \ch\) with \(h(r) = c_0\).
+Since \(c_0 \in N(h(l_1)) \cap N(h(l_2))\),
+by Fact~\ref{fact:common_neighbors},
+we have \(|N(h(l_1)) \cap N(h(l_2))| \in \{2,5\}\).
+Now, let \(c_1 \in N(h(l_1)) \cap N(h(l_2))\) with \(c_1\neq c_0\).
+Since \(\ch\) has no triangles, \(c_1\) is not adjacent to \(c_0\),
+and hence \(c_1\in C\).
+Finally, let \(ah \colon T \to \ch\) be
+the homomorphism with \(ah(r) = c_1\), and \(ah(l_i) = h(l_i)\) for \(i \in \{1,2\}\).
+By the choice of \(c_0\), we have that \(c_1 \neq 0\),
+and hence \(\cost(ah) \leq \cost(h)\),
+as desired.
+\end{proof}
+
+% We, naturally, refer to such pairs \((c_0,C)\) as defined above as \emph{trivial replacements},
+% and we formalize this observation with the following lemma.
+
+% Given $v \in C$ and a homomorphism \(h\colon T\to CH\), a \((v,h)\)-\emph{associated homomorphism} is any homomorphism $ah \colon T \to CH$ such that 
+% (i) $ah(r) = v$; 
+% (ii) $ah(L(T)) = h(L(T))$; and
+% (iii) $cost(ah) \leq cost(h)$.
+% We call the pair $(c_0, C)$ a  \emph{replacement with respect to \(T\)} if for every homomorphism $h \colon T \to CH$ such that $h(r) = c_0$, there is a \((v,h)\)-associated homomorphism $h^* \colon T \to CH$ such that $v \in C$. 
+
+
+
+ % It is easy to see that a replacement implies in at least one associated homomorphism for each vertex in $C$.
+
+% Given a graph $G$, a cubic tree $T \subseteq G$, a homomorphism $h \colon G \to H$ such that $cost(h|_{T}) > 0$, a homomorphism $h' \colon T \to H$ with $cost(h') = 0$ and $h(L(T)) , h'(L(T))$ are 1-similar with $x$ as important vertex. Now, pick a tree $T' \subseteq G \setminus T$ rooted in $x$ such that $(h(x),C)$ is a replacement where $h'(x) \in C$ and $ah$ is the associated homomorphism such that $ah(x) = h'(x)$ and $ah(L(T')) = h(L(T'))$, we can construct the \((h,h')\)-replaced homomorphism such: 
+
+% \[ 
+%  (h,h')\text{- replaced homomorphism}(v) = 
+%      \begin{cases}
+%        h'(v) &\quad\text{if } v\in V(T)\\
+%        ah(v) &\quad\text{if } v\in V(T')\\
+%        h(v) &\quad\text{if } v\notin V(T) \cup V(T')
+%      \end{cases}
+% \]
+
+% It's easy to see that the $(h,h')$-replaced homomorphism $rh$ is a $(h, rh|_{T U T'})$ modified homomorphism such that $cost(rh|_{T U T'}) < cost(h)$.
+
+
+
+% \textbf{fim do teste do palmeira}
+
+% \textbf{Teste Fábio}
+
+% A \emph{replacement} is a pair \((c_0,C)\) with \(c_0\in V(H)\) and \(C\subseteq V(H)\setminus(\bads\cup\{c_0\})\).
+
+% %%% TEMOS QUE TER UM LEMMA COMO O SEGUINTE
+
+% \begin{lemma}\label{lemma:replacements_problem}
+% Every configuration in \(\mathcal{D}_3\) is either good or \(1\)-similar to good.
+% \end{lemma}
+
+% % assumindo que 
+% %   configuração descendente já foi definida
+% %   configuração boa/ruim já foi definida
+% %   1-subsimilar to good já foi definida
+% In what follows, fix a replacement \((c_0,C)\).
+% Given \(i\in\{1,2,3\}\) let \(\mathcal{C}_i\) be the set of configurations defined as follows. 
+% If \(i = 1\), then \(\mathcal{C}_1\) is the set of all configurations of homomorphisms of the a binary tree with height 1 in which the root is colored with \(c_0\);
+% and for \(i\in\{2,3\}\), \(\mathcal{C}_i\) is the set of all configurations descendent of bad configurations in \(\mathcal{C}_{i-1}\).
+
+% We say \((c_0,C)\) is \emph{valid for the subsubproblem}
+% if every configuration in \(\mathcal{C}_3\) is good;
+% and we say that \((c_0,C)\) is \emph{valid for the subproblem}
+% if every configuration in \(\mathcal{C}_3\) is either good or \(1\)-subsimilar to good.
+
+% We prove the following lemma.
+
+% \begin{lemma}\label{lemma:replacements_sub_and_subsubproblem}
+% \begin{itemize}
+%     \item[(a)]Every replacement in Table~\ref{table:subproblem} is valid for the subproblem; and
+%     \item[(b)] Every replacement in Table~\ref{table:subsubproblem} is valid for the subsubproblem.
+% \end{itemize}
+% \end{lemma}
+
+% \begin{proof}[Proof of Lemma~\ref{lemma:main-lemma}]
+%     Let \(G\) and \(h\) as in the statement,
+%     and let \(u\) be such that \(h(u) \in\bads\).
+%     For \(i\in\{1,2,3\}\),
+%     let \(T_i\) be the complete tree of height \(i\) rooted at \(u\).
+%     %%%%% Passo 1
+%     Let \(\conf_1\) be the configuration of \(T_1\) induced by \(h\),
+%     and note that \(\conf_1\in\mathcal{D}_1\).
+%     If \(\conf_1\) is good, then there is an \(h\)-compatible homomorphism 
+%     \(h'\colon T_1 \to H\) with \(\cost(h') \leq \cost(h|_{T_1}\),
+%     a contradiction to Lemma~\ref{lemma:there-is-no-improvement}.
+%     Therefore, we may assume that \(\conf_1\) is bad.
+
+%     %%%%% Passo 2
+%     Now, let \(\conf_2\) be the configuration of \(T_2\) induced by \(h\),
+%     and note that \(\conf_2\) is a configuration descendent of \(\conf_1\),
+%     and since \(\conf_1\) is bad, we have \(\conf_2\in\mathcal{D}_2\).
+%     If \(\conf_2\) is good, then there is an \(h\)-compatible homomorphism 
+%     \(h'\colon T_2 \to H\) with \(\cost(h') \leq \cost(h|_{T_2}\),
+%     a contradiction to Lemma~\ref{lemma:there-is-no-improvement}.
+%     Therefore, we may assume that \(\conf_2\) is bad.
+
+%     %%%%% Passo 3
+%     Now, let \(\conf_3\) be the configuration of \(T_3\) induced by \(h\),
+%     and note that \(\conf_3\) is a configuration descendent of \(\conf_2\),
+%     and since \(\conf_2\) is bad, we have \(\conf_3\in\mathcal{D}_3\).
+%     If \(\conf_3\) is good, then there is an \(h\)-compatible homomorphism 
+%     \(h'\colon T_3 \to H\) with \(\cost(h') \leq \cost(h|_{T_3}\),
+%     a contradiction to Lemma~\ref{lemma:there-is-no-improvement}.
+%     Therefore, we may assume that \(\conf_3\) is bad.
+%     By Lemma~\ref{lemma:replacements_problem},
+%     \(\conf_3\) is \(1\)-similar to good.
+
+%     %%%%% Passo 4
+% \end{proof}
+
+% \textbf{Fim nova definição}
+
+% %TODO Talvez queiramos que a definição de replacement seja independente do grafo cúbico
+% % Let \(G\) be a cubic graph that has an homomorphism to \(H\),
+% % and consider a semicomplete binary tree \(T\subseteq G\) with root \(r\in V(G)\).
+% %
+% Let \(T\) be a semicomplete binary tree with root \(r\in V(T)\), 
+% and let \(c_0 \in V(H)\) and \(C\subseteq V(H)\setminus\{c_0\}\).
+% We say that $c_0$ can be \emph{replaced} (in \(T\)) by \(C\)
+% if for every homomorphism \(h\colon T \to H\) with \(h(r) = c_0\) there is a \(h\)-compatible homomorphism \(h'\)
+% such that \(\cost(h') \leq \cost(h)\) and \(h'(r)\in C\).
+% The next lemma comes handily.
+
+% \begin{lemma}
+%     Let \(T\) and \(T'\) be two semicomplete binary trees
+%     with \(T'\subseteq T\) and root (of~both trees) \(r\).
+%     Let \(c_0 \in V(H)\) and \(C\subseteq V(H)\setminus\{c_0\}\).
+%     If \(c_0\) can be replaced by \(C\) in~\(T'\),
+%     then \(c_0\) can be replaced by \(C\) in \(T\).
+% \end{lemma}
+
+
+% \begin{proof}
+% Let \(T\), \(T'\), $r$, \(c_0\), \(C\) are as above. 
+% % Thus, there is an homomorphism $c_1$ for which there is no $c_1$-\compatible{} homomorphism $c_2$ such that  $c_2(r) \in C$ and $cost(c_2) \leq cost(c_1)$.
+% Let \(c_1\) an homomorphism from \(T\) to \(H\) with \(c_1(r) = c_0\).
+% Consider the restriction $c_{1|T'}$.
+% Since \(c_0\) can be replaced by \(C\) in \(T'\), 
+% there is an {\color{red}homomorphism $c_3 \colon T' \to H$} with $cost(c_3) \leq cost(c_{1|T'})$ and \(c_3(r) \in C\). 
+% Therefore the $(c_1, c_3)$-modified map $c_4$ is a homomorphism from $T$ to $H$ for which we have, by Lemma~\ref{lemma:cost-improvement}, $cost(c_4) \leq cost(c_1)$,
+% as desired.     
+% \end{proof}
+
+% %%% TODO:  a ideia agora é que queremos apresentar a tabela de replacements, e para isso queremos apresentar a menor tabela possível, então vamos apresentar apenas replacements minimais. Além disso, no futuro, queremos testar apenas esses replacements minimais.
+
+% By definition, if \(c_0\) can be replaced by \(C\) in \(T\),
+% then \(c_0\) can be replaced by \(C'\) for every superset \(C'\) of \(C\).
+% We formalize this in the following lemma,
+% and we say that a pair \((c_0,C)\) as above is \emph{minimal}
+% if there is no proper subset \(C''\subseteq C\)
+% for which \(c_0\) can be replaced by \(C''\).
+
+% \begin{lemma}
+%     Let \(T\) be a semicomplete binary tree.
+%     Let \(c_0 \in V(H)\) and let \(C,C'\subseteq V(H)\setminus\{c_0\}\)
+%     be such that \(C \subseteq C'\).
+%     If \(c_0\) can be replaced by \(C\) in \(T\),
+%     then \(c_0\) can be replaced by \(C'\) in \(T\).   
+% \end{lemma}
+
+% %TODO: Exemplo de que há cores que podem ser resolvidas no nível 1
+
+% In what follows, given a vertex \(c_0\in V(H)\), denote by \(N_2(c_0)\) the set of vertices that have distance \(2\) from \(c_0\).
+% Now, let \(u,v\in V(H)\).
+% It's not hard to check that if \(u\) and \(v\)
+% have a common neighbor, then \(u\) and \(v\) have precisely two common neighbors.
+% As a consequence we obtain the following result.
+% \begin{lemma}
+%     \label{lemma:height-1-replacement}
+%     Let \(T\) be a complete binary tree of height \(1\) (i.e., a path with two edges), and 
+%     let \(c_0 \in V(H)\). 
+%     Then \(c_0\) can be replaced in \(T\) by \(C\)
+%     if and only if 
+%     \begin{itemize}
+%         \item[i.]    \(N_2(c_0)\subseteq C\); and
+%         \item[ii.]   \(N_2(c_0)\cap \bads = \emptyset\).
+%     \end{itemize}
+% \end{lemma}
+% %% Definir valid replacement, são os elementos da replacement table
+% \newcommand{\validreplacement}[]{valid replacement}
+% \newcommand{\validreplacements}[]{valid replacements}
+% \newcommand{\witness}[]{witness}
+% Given \(c_0\in V(H)\) and a set \(C\subseteq V(H)\setminus\{c_0\}\),
+% we say that the pair \((c_0,C)\) is a \emph{\validreplacement}
+% if there is a semicomplete binary tree \(T\)
+% such that \(c_0\) can be replaced by \(C\) in \(T\).
+% In this case, we say that \(T\) is the \witness{} of \((c_0,C)\).
+% %% TODO o comentário abaixo é importante, mas deve vir no lugar certo
+% % Observe that there are at most \(16 \cdot 2^{15}\) \validreplacements,
+% % and hence there is a constant \(K\) for which \(T\) has height at most \(K\).
+% %
+% The valid replacements given by Lemma~\ref{lemma:height-1-replacement} are presented in Table~\ref{table:replacements-height-1}. 
+% We can check with the aid of a computer that the tree \(T\) in the statement of Lemma~\ref{lemma:height-1-replacement} can be replaced by a complete binary tree of height \(3\).
+
+\begin{table}
+\centering
+\caption{Trivial Replacements.  } %explicar no caption quem é c_0 e C
+\label{table:replacements-height-1}
+\begin{tabular}{|c|c|}
+% \hline
+% \multicolumn{3}{| c |}{}\\
+\hline
+c_0 & C \\
+\hline
+0 &  \{2, 3, 4, 5, 7, 9, 11, 12, 14, 15\}  \\
+\hline
+1 & \{2, 5, 6, 7, 8, 10, 11, 12, 13, 14\}  \\
+\hline
+6 &  \{1, 2, 4, 5, 8, 9, 10, 11, 13, 15\}  \\
+\hline
+8 & \{1, 3, 4, 6, 7, 10, 11, 12, 13, 15\}  \\
+\hline
+10 &  \{1, 3, 5, 6, 8, 9, 12, 13, 14, 15\}  \\
+\hline
+13 &  \{1, 2, 3, 4, 6, 7, 8, 9, 10, 14\}  \\
+\hline
+\end{tabular}
+\end{table}
+
+% Let \(T\) be a complete binary tree of height \(2\).
+% We prove with the aid of a computer the following lemma.
+
+% %%% Falar sobre minimalidade de replacements, i.e., se c_0 pode ser replaced by C', então c_0 pode ser replaced by C para todo superconjunto C de C'
+
+% %% Definir valid replacement, são os elementos da replacement table
+% \newcommand{\validreplacement}[]{valid replacement}
+% \newcommand{\validreplacements}[]{valid replacements}
+% \newcommand{\witness}[]{witness}
+% Given \(c_0\in V(H)\) and a set \(C\subseteq V(H)\setminus\{c_0\}\),
+% we say that the pair \((c_0,C)\) is a \emph{\validreplacement}
+% if there is a semicomplete binary tree \(T\)
+% such that \(c_0\) can be replaced by \(C\) in \(T\).
+% In this case, we say that \(T\) is the \witness{} of \((c_0,C)\).
+% %% TODO o comentário abaixo é importante, mas deve vir no lugar certo
+% Observe that there are at most \(16 \cdot 2^{15}\) \validreplacements,
+% and hence there is a constant \(K\) for which \(T\) has height at most \(K\).
+
+
+
+% %% Aqui eu preciso ter a informação da replacement table
+
+
+% \begin{lemma}[Replacement Lemma]
+%     Let \((c_0,C)\) be a \validreplacement~whose \witness~is a tree \(T\),
+%     let \(G\) be a subcubic graph that has a homomorphism \(c\) to \(H\),
+%     and let \(r\) be a vertex for which 
+%     \begin{itemize}
+%         \item[(i)]  \(d_G(r) = 2\);
+%         \item[(ii)]  \(c(r) = c_0\); and
+%         \item[(iii)] there is a copy of \(T\) in \(G\) whose root is \(r\).
+%     \end{itemize}
+%     Then \(G\) has a homomorphism \(c'\) to \(H\)
+%     such that 
+%     \begin{itemize}
+%         \item[(a)]  \(c'(r) \in C\); 
+%         \item[(b)]  \(c'(u) = c(u)\) for every vertex \(u\in\big(V(G)\setminus V(T)\big)\cup L(T)\), i.e., \((c'(u) \neq c(u)\)
+%         only if \(u\) is an internal vertex of \(T\);
+%         and 
+%         \item[(c)] \(\cost(c') \leq \cost(c)\).
+%     \end{itemize}
+% \end{lemma}
+
+% Given a tree \(T\), we denote by \(I(T)\) the set of internal vertices of \(T\)
+
+% \begin{lemma}[Replacement Lemma version 2]
+%     Let \((c_0,C)\) be a \validreplacement~whose \witness~is a tree \(T\),
+%     let \(G\) be a cubic graph with girth \(30\), 
+%     and let \(T^*\) be a semicomplete tree in \(G\) whose root has degree \(3\).
+%     Let \(c\) be a homomorphism from \(G\) to \(H\),
+%     and let \(r\) be a leaf of \(T^*\) such that
+%     \begin{itemize}
+%         \item[(i')]  \(c(r) = c_0\); and
+%         \item[(ii')] there is a copy of \(T\) in \(G\setminus (V(T^*)\setminus\{r\})\) whose root is \(r\).
+%     \end{itemize}
+%     Then \(G'=G\setminus I(T^*)\) has a homomorphism \(c'\) to \(H\)
+%     such that 
+%     \begin{itemize}
+%         \item[(a)]  \(c'(r) \in C\); 
+%         \item[(b)]  \(c'(u) = c(u)\) for every vertex \(u\in\big(V(G')\setminus V(T)\big)\cup L(T)\), i.e., \(c'(u) \neq c(u)\)
+%         only if \(u\) is an internal vertex of \(T\);
+%         and 
+%         \item[(c)] \(\cost(c') \leq \cost(c)\).
+%     \end{itemize}
+% \end{lemma}
+
+% \begin{lemma}
+    
+    
+% \end{lemma}
+
+
+%%TODO Implementação
+%TODO Folha tá definido?
+%% Introdução sobre implementação. Vamos mostrar como fizemos para provar o Lemma 4. Nós codificamos cada configuração 
+%TODO verificar se há ainda algum "valid" pois valid foi substituído por "feasible
+
+\section{Configurations}\label{sec:configurations}
+
+Given a tree $T$, a \emph{configuration} of \(T\) is any function $conf\colon L(T) \to V(CH)$.
+We say that a configuration $conf$ of \(T\) is \emph{feasible} if there is an homomorphism $h \colon T \to CH$ such that \(h|_{L(T)} = conf\), i.e., such that $conf(x) = h(x)$ for every $x \in L(T)$. In other words, $conf$ is feasible if it can be completed to a homomorphism $h\colon T \to CH$.
+In this case, we say that \(h\) is a \emph{completion} of \(conf\).
+Note that there may be many different completions of \(conf\).
+We denote by \(RH(conf)\) the set of completions of \(conf\),
+and we say that any two homomorphisms in \(RH(conf)\) are \emph{related}.
+Observe that two homomorphisms \(h_1,h_2 \colon T \to \ch\) 
+are related if and only if \(h_1|_{L(T)} = h_2|_{L(T)}\).
+
+
+% Suppose that \(B_1\) is defined as in Section~\ref{sec:clebsch}.
+% Let $T$ be a rooted tree with root~$r$, and let $h\colon T \to CH$.
+% The \emph{internal cost} of \(h\) (with respect to \(B_1\)) 
+% is the number of internal vertices (vertices that are not leaves) of \(T\) that are colored (by \(h\)) with colors in \(B_1\),
+% i.e., the internal cost of \(h\) is the value 
+% \[\ic(h) = | \{v \in V(T)\setminus L(T) : h(v) \in B_1 \} |.\]
+% In this work, we make use of the following two costs defined in terms of \(\ic\).
+
+\begin{definition}\label{def:conf-costs}
+Given a configuration \(conf\),
+the \emph{free cost} $FC(conf)$ and the \emph{restricted cost} $RC(conf)$ of \(conf\) 
+are, respectively, the values
+\begin{align*}
+    FC(conf) & = \min\{ cost(h) : {h \in RH(conf)}\}, \text{ and } \\
+    RC(conf) & = \min\{ cost(h) : {h \in RH(conf) \text{ and } h(r) \in B_1}  \}
+\end{align*}
+%
+In the case that there is no completion \(h\) of conf such that \(h(r) \in B_1\),
+we set \(RC(conf) = \infty\).
+
+\end{definition}
+
+The later case of Definition~\ref{def:conf-costs},
+where there is no completion of~\(h\), is crucial in the case \(T\) has height \(0\).
+Indeed, in this case \(conf\) consists precisely of the color of~\(r\),
+and there is only one completion of \(conf\) which is \(conf\) itself.
+Therefore, if \(conf(r) \in B_1\), then \(FC(conf) = RC(conf) = 1\);
+and if \(conf(r) \notin B_1\), then we have \(FC(conf) = 0\)
+while \(RC(conf) = \infty\) because the set \(\{h : h \in RH(conf)\text{ and } h(r) \in B_1)\}\) is empty.
+
+Observe that \(FC(conf) \leq RC(conf)\) for every configuration conf of a tree~\(T\).
+We say that that a configuration \(conf\) is bad if equality holds,
+i.e., if \(FC(conf) = RC(conf)\);
+and we say that a configuration $conf$ is \emph{good}, otherwise, i.e., if $FC(conf) < RC(conf)$.    
+
+The next lemma is a straightforward consequence of the definition above.
+
+%Let $T$ and $T'$ be trees such that $T' \subseteq T$,  $c_1 \colon L(T) \to V(H)$ and $c_2 \colon L(T') \to V(H)$, we say that $c_1$ is \emph{descendent} of $c_2$ if there is an homomorphism $h \colon T \to H$ such that $h \in RH(c_1)$ and $h_{|T'} \in RH(c_2)$. 
+
+\begin{lemma}\label{lemma:every-good-configuration}
+    Let \(G\)  be a graph, $T$ be cubic tree in $G$ with root \(r\), 
+    and $h \colon G \to CH$ be a homomorphism with $h(r) \in B_1$,
+    and let \(conf = h|_{L(T)}\).
+    If $conf$ is good, then there is an $h$-compatible homomorphism $h'\colon T \to CH$ such that $cost(h') < cost(h|_{T} )$.
+\end{lemma}
+
+
+TODO: Definição inicial ??
+
+Given a complete tree $T$ of height \(h\geq 1\), the \emph{internal induced subtree} $T^{(1)}$ is the subtree of \(T\) induced by the vertices in $V(T) \setminus L(T)$. 
+Additionally, we define $T^{(2)}$ to be $(T^{(1)})^{(1)}$ and, 
+more generally, if \(d < h\), then $T^{(d)} = (T^{(d-1)})^{(1)}$.
+
+\newcommand{\parents}{\mathcal{P}}
+Now let $conf$ be a configuration on $T$, 
+a \emph{parents configuration} of \(conf\)
+is any configuration $conf^p$ of \(T^{(1)}\)
+for which there is a completion $h$ of \(conf\) with $h(L(T^{(1)})) = conf^p$. 
+In this case, we additionally say that $conf$ is a \emph{child} of $conf^p$.
+The set of parents configurations of \(conf\) is denoted by \(\parents(conf)\).
+The following lemma comes naturally.
+
+%TODO Verificar pontos finais: todo parágrafo, e toda equação centralizada tem que ser pontuada.
+\begin{lemma}\label{lemma:child-costs} 
+    Let $T$ be a complete tree with root \(r\), and $conf$ a configuration of~$T$.
+    If \(T\) has height \(0\),
+    then \(FC(conf) = RC(conf) = 1\) if \(conf(r) \in B_1\),
+    and \(FC(conf) = 0\) and \(RC(conf) = \infty\) otherwise;
+    and if \(T\) has height $l\geq 1$, then the following hold.
+    \begin{itemize}
+    \item[] \(FC(conf) = \min\{FC(conf^p) + cost(conf^p): conf^p \in \parents(conf)\} \); and 
+    \item[] \(RC(conf) = \min\{RC(conf^p) + cost(conf^p): conf^p \in \parents(conf)\}\).
+    \end{itemize}
+    Consequently, a configuration \(conf\) is bad if and only if
+    \begin{align*}
+        & \min\{FC(conf^p) + cost(conf^p): conf^p \in \parents(conf)\}\\
+        &= \min\{RC(conf^p) + cost(conf^p): conf^p \in \parents(conf)\}.
+    \end{align*}
+\end{lemma}
+
+Therefore, if all parents configurations of  \(conf\) are good,
+then \(conf\) is good.
+Consequently, any feasible bad configuration of a tree of height at least 1 has at least one bad parents configuration,
+and to find all bad configurations of a tree \(T\) with height at least 1, 
+it suffices to classify the children configurations of the bad configurations of \(T^{(1)}\).
+
+TODO: Define substitutions and replacements with girth 
+
+\subsection{Similar and solvable configurations}
+
+Given a tree \(T\), 
+we say that two configurations \(conf_1\) and \(conf_2\) of \(T\)
+are \emph{similar} if \(conf_1(x) \neq conf_2(x)\)
+for precisely one \(x\in L(T)\),
+i.e., if \(|\{x\in L(T) : conf_1(x) \neq conf_2(x)\}| = 1\).
+Equivalently, we say that \(conf_2\) is \emph{similar to} \(conf_1\).
+%
+Now, given a cubic graph $G$, a homomorphism $h \colon G \to CH$, a tree $T \subseteq G$, let $conf = h|_{L(T)}$.
+A \emph{substitution} on \(conf\) is a configuration \(conf_*\) similar to \(conf\) for which
+there is a homomorphism $h^* \colon G \to CH$ such that 
+(a) $cost(h^*|_{V(T)}) \leq cost(h|_{V(T)}) $;
+(b) $cost(h^*|_{V(G) \setminus V(T)}) \leq cost(h|_{V(G) \setminus V(T)}) $; and 
+(c) $h^*|_{L(T)} = conf_*$.
+% Now, given a cubic graph $G$, a homomorphism $h \colon G \to CH$, a tree $T \subseteq G$ and a $conf$ of $T$, a \emph{substitution} is any mapping $s$ from $conf$ to another configuration $conf_*$ such that 
+% (i) $conf_*$ and $conf$ are similar; 
+% (ii) $conf_*$ is a valid configuration; and
+% (iii) there is a homomorphism $h^* \colon G \to CH$ such that 
+% (a) $cost(h^*|_{T}) \leq cost(h|_{T}) $;
+% (b) $cost(h^*|_{G \setminus T}) \leq cost(h|_{G \setminus T}) $; and 
+% (c) $h^*|_{L(T)} = conf_*$  
+%
+The next result relates replacements and substitutions.
+%TODO: definir \FC e \RC e substituir no texto inteiro
+\begin{lemma}
+Let $G$ be a graph, $T\subseteq G$ be cubic tree, $conf$ a configuration of \(T\), 
+$x \in L(T)$ and $conf(x) = c_0$.
+Let \((c_0,C)\) be a replacement,
+and for each \(c\in C\), let \(conf_{x\to c}\) be the configuration obtained from \(conf\) by coloring \(x\) with \(c\).
+If $RC(conf_{x\to c})~\leq~RC(conf)$ for every \(c\in C\), then for any homomorphism $h \colon G \to CH$ such that $conf = h|_{L(T)}$, \(conf_{x\to c}\) is a substitution on \(conf\). 
+%with \(h(x) = c_0\), 
+\end{lemma}
+
+Finally, a configuration $conf$ is \emph{solvable} if, 
+for every homomorphism $h$ for which $conf = h|_{L(T)}$, 
+there is a finite sequence \(conf = conf_0, conf_1, \ldots, conf_s\)
+such that for \(i\in\{1,\ldots, s\}\), we have
+(i) \(conf_i\) is a substitution of \(conf_{i-1}\); and 
+(ii) \(conf_s\) is a good configuration.
+The next lemma generalizes Lemma~\ref{lemma:every-good-configuration}.
+
+\begin{lemma}\label{lemma:every-good-and-solvable-configuration}
+Let \(G\)  be a graph, $T \subseteq G$ a complete cubic tree rooted in $r$, 
+and $h \colon G \to GH$ be a homomorphism with $cost(h(r))>0$. 
+If $conf = h|_{L(T)}$ is good or solvable, 
+then \(T\) can be extended to a tree \(T^+ \subseteq G\)
+for which there is $h$-compatible homomorphism $h'\colon T^+ \to GH$ such that 
+ \(cost(h') < cost(h|_{T^+})\) and, moreover, $cost(h'(r))=0$.
+\end{lemma}
+TODO: Proof by induction 
+
+
+Rascunho prévio 
+
+\begin{comment}
+We say that two configurations \(conf_1\) and \(conf_2\)
+are \emph{similar} if \(conf_1(x) \neq conf_2(x)\)
+for at most one \(x\in L(T)\),
+i.e., if \(|\{x\in L(T) : conf_1(x) \neq conf_2(x)\}| = 1\);
+and that a bad configuration \(conf_1\) is \emph{solvable}
+if there are
+(i) a vertex \(x\in L(T)\); 
+(ii) a complete binary tree $T^*$ with height at most 3, rooted in $x$, and with $V(T^*) \cap V(T) = \{x\}$; and 
+(iii) a replacement \((c_0,C)\) with respect to \(T^*\)
+such that 
+(a) \(conf_1(x) = c_0\); and 
+(b) for every \(c\in C\), the configuration obtained from \(conf_1\) by coloring \(x\) with \(c\) is a good configuration with restricted cost at most $RC(conf_1)$.
+In this case, we say that \(conf_1\) is solvable through the replacement \((c_0,C)\) at \(x\).
+
+% \begin{lemma}\label{lemma:every-bad-solvable-configuration}
+%     Let \(G\)  be a graph, $T$ be a complete tree in $G$ with root \(r\), 
+%     and $h \colon G \to H$ be a homomorphism with $cost(h(r))>0$,
+%     for which \(conf = h|_{L(T)}\) is bad.
+%     If $conf$ is solvable,
+%     then there is a tree \(T^+ \supset T\) and an $h$-compatible homomorphism $h'\colon T^+ \to H$ such that $cost(h') < cost(h_{|T^+} )$.
+% \end{lemma}
+
+% \begin{proof}
+%     Let \(G\), \(T\), \(r\), \(h\), and \(conf\) as in the statement.
+%     Suppose that \(conf\) is solvable by a replacement \((c_0,C)\) at the vertex \(x\in L(T)\), and let \(T^*\) be the witness of \((c_0,C)\).
+    
+% \end{proof}
+
+% \begin{lemma}\label{lemma:every-bad-solvable-configuration}
+%     Let \(G\)  be a graph, $T$ be a complete tree in $G$ with root \(r\), 
+%     and $h \colon G \to H$ be a homomorphism with $cost(h(r))>0$,
+%     for which \(conf = h|_{L(T)}\) is bad.
+%     Suppose that $conf$ is solvable by a replacement at a vertex \(x\) that is witnessed by a tree \(T^*\),
+%     and let \(T^+\subseteq G\) the minimal tree rooted at \(r\) that contains \(T\)
+%     and whose subtree rooted at \(x\) is a copy of \(T^*\).
+%     Then there is an $h$-compatible homomorphism $h'\colon T^+ \to H$ such that $cost(h') < cost(h_{|T^+} )$.
+% \end{lemma}
+
+\begin{lemma}
+    Let \(G\)  be a graph, $T \subseteq G$ a complete cubic tree rooted in $r$, 
+    and $h \colon G \to CH$ be a homomorphism with $cost(h(r))>0$. 
+    If $conf = h|_{L(T)}$ is good or solvable, 
+    then \(T\) can be extended to a tree \(T^+ \subseteq G\)
+    for which there is $h$-compatible homomorphism $h'\colon T^+ \to CH$ such that 
+     \(cost(h') < cost(h|_{T^+})\) and, moreover, $cost(h'(r))=0$.
+    % then there are a tree \(T^+\), with \(T\subset T^+\), 
+    % and an $h$-compatible homomorphism $h'\colon T^+ \to H$ such that 
+    % \(cost(h') < cost(h|_{T^+})\) and, moreover, $cost(h'(r))=0$.
+\end{lemma}
+\begin{proof}
+    If $conf$ is a good configuration, by Lemma \ref{lemma:every-good-configuration}, we have an $h$-compatible homomorphism $h'\colon T \to CH$ such that the $cost(h') < cost(h_|{T})$. 
+    In this case, we set \(T^+ = T\), and the statement follows.
+    
+    Thus, we may assume that $conf$ is solvable.
+    Then there is an \(x\in L(T)\), a tree $T^*$, and a replacement $(c_0,C)$ with respect to \(T^*\)
+    satisfying (a) and (b) above. 
+    %Let $T^*$ be the subtree of $T^+$ rooted in $x$, we know
+    By the definition of replacement, there is an $(x,h|_{T^*})$-associated homomorphism $h^{*}$ for which $h^{*}(x) \in C$.
+    Now, let $conf^*$ be the configuration obtained from \(conf\) by coloring \(x\) with $h^{*}(x)$.
+    Thus, there is \(h_2 \in RH(conf_2)\) such that \(cost(h_2) = FC(conf_2)\).
+    By the definition of solvable, \(conf^*\) is good and $RC(conf^*) \leq RC(conf)$. 
+    Now, put \(T^+ = T \cup T^*\),
+    and let \(h'\) be the \(h\)-compatible homomorphism (with respect to \(T^+\)) defined by 
+    \[ 
+     h'(v) = 
+         \begin{cases}
+           h_2(v) &\quad\text{if } v\in V(T)\\
+           h^*(v) &\quad\text{if } v\in V(T^*)\\
+         \end{cases}
+    \]
+
+    Since \(V(T^*) \cap V(T) = \{x\}\), we have
+    \begin{align*}
+        cost(h') & = cost(h_2) + cost (h^*) - cost(h'(x)); \text{ and} \\
+        cost(h|_{T^+}) & = cost(h|_{T}) + cost (h|_{T^*}) - cost(h(x))
+    \end{align*}
+
+    We know that $cost (h^*) \leq cost(h|_{T^*})$ because $(c_0,C)$ is a replacement with respect to \(T^*\).
+    Moreover, by the definition of \(h_2\) we have
+    $cost(h_2) = FC(conf_2)$ and $cost(h_2(r)) = 0$.
+    Also, since \(conf_2\) is good, we have \(FC(conf_2) < RC(conf)\),
+    and hence \(cost(h_2) < RC(conf) \leq cost(h|_T)\).
+    Therefore
+    \begin{align*}
+        cost(h')    & =     cost(h_2)   + cost (h^*)        - cost(h'(x))\\
+                    & <     RC(conf)    + cost(h|_{T^*})    - cost(h'(x)) \\
+                    & \leq  cost(h|_T)  + cost(h|_{T^*})    - cost(h'(x)) \\
+                    & =     cost(h|_{T^+})
+    \end{align*}
+    as desired.
+%    
+    % We build a new \(h\)-compatible homomorphism (with respect to \(T^+ \)).
+    % Let $T^+ = T \cup T^*$, we know there is the $(h(x), h)$-associated homomorphism $ah \colon T^* \to H$ such that  $cost(ah) \leq cost (h|_{T^*})$.
+ %   
+    % we have the $(h,h')$-replaced homomorphism $ah \colon T^+ \to H$ with $cost(ah) =0$
+ %       
+    % and we have that we can form the $(h,h')$-replaced homomorphism $ah \colon T^+ \to H$ with $cost(ah(r)) =0$ . 
+\end{proof}
+\end{comment}
+
+Lemma~\ref{lemma:every-good-and-solvable-configuration} implies that if we can find a constant $\ell$ such that every feasible configuration of a cubic tree $T$ of height $\ell$ is good or solvable, we verify Conjecture~\ref{conjecture:main-conjecture}. 
+In Chapter~\ref{chapter:implementation}, we show how we compute the set of feasible, good and solvable configurations for a cubic tree of arbitrary height. 

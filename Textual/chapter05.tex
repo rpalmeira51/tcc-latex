@@ -1,0 +1,68 @@
+\chapter{Disproving the conjuncture}
+
+
+
+%
+%- Assume árvore binária completa  
+%- A gente pega dois vértices irmãos quaisquer
+%- Considera os 4 filhos deles e agora considera as cores possiveos para recoloris esses dois vértices 
+%
+%- Seja c^(-1) uma configuração de T^(-1), então há configuração c de T cuja única compleção dos pais de L(T) é c^(-1)
+%
+%- indução: se T tem altura 1. Então c^(-1) consiste apenas de uma cor. Seja a,b,c três vizinhos distintos de c^(-1) no Grafo de Clebsch. 
+%Suponha que T tem altura h, e seja c^(-1) = (f_1,...,f_k) uma coloração de L(T^(-1)).
+%Para cada f_i 
+%Para cada par u,v de irmãos em L(T^(-1)), sejam a,b, e c,d os filhos de u e v tal que os pares (a,b) e (c,d)   e c(a),c(u) $\in E(CH)$ ... 
+%observe que c(u) e c(v) são cores não adjacentes em CLEBSCH. 
+%Seja c(u') (resp. c(v')) uma cor não adjacente a c(u) (resp. c(v)) diferente de c(v) (resp. c(u))
+%tais que c(u') e c(v') são vizinhos. 
+%*** Seja c(u') e c(v') cores tais que (c(u), c(v'), c(u'), c(v)) induzem um P4 induzido em CLEBSCH.
+%Argumentar que isso é sempre possível.
+%Agora seja c(a) e c(b) (resp. c(c) e c(d)) os vizinhos em comum de c(u) e c(u') (resp. c(v) e c(v')).
+%Colora os filhos a,b de u com c(a) e c(b), e os filhos c,d de v com c(c) e c(d).
+%Isso nos dá uma configuração para T.
+%Observe que as únicas cores possíveis para u (reps. v) são c(u) e c(u') (resp. c(v) e c(v')). 
+%Como  (c(u), c(v'), c(u'), c(v)) induzem um P4 induzido em CLEBSCH,
+%e a cor c1 de u (resp. c2 de v) deve ser uma cor em \(\{c(u),c(u')\}\) (resp. \(\{c(v),c(v')\}\) tal que c1 e c2 não são adjacentes, então temos que c1 = c(u) e c2 = c(v). 
+
+
+For any pair $p$ of distinct non adjacent vertices of the Clebsch Graph, there are two and only two common neighbours of both vertices in $p$.  
+
+We shall call the \emph{extension} of a pair $p$, the induced subgraph formed by the vertices in $p$ and it's common neighbours.
+
+Now, let $p_1$ and $p_2$ be two distinct pairs of distinct non adjacent vertices of the Clebsch Graph and consider the induced subgraph $S$ formed by the common neighbors $u$ and $v$ of $p_1$ and $z$ and $w$ of $p_2$. 
+
+
+Let $o$ be a children ordering and suppose, without loss of generality, that $p_1$ is smaller than $p_2$ in this order and also that both pairs are ordered.
+
+Then let $T$ be a complete binary tree of height 2 rooted in $r$ and $conf$ be a any configuration in $T$ such that it's signature is the sequence formed by the two vertices in $p_1$ followed by the two in $p_2$. 
+
+We know that any $conf^{p}$ must color the first vertex with $u$ or $z$ and the second one with $z$ or $w$. 
+Note that $S$ is bipartite graph with $\{u,v\}$ and $\{z, w\}$ as the independent components.
+Then is easy to see that, if $conf$ is valid, there must be at least one non edge between the two partition such that the vertices of this non edge have common neighbours. 
+If there is precisely one non edge, the root can only be colored with the two colors adjacent to both vertices of the non edge for any completion of $conf$. 
+
+Given any pair of non adjacent vertices in $CH$, we can always construct a configuration $conf$ in $T$ such that all of its completions color $r$ with one of the pair's vertices. 
+
+
+
+We can always produce a configuration $conf$ such that completion of $conf$ can only color the root with any two non adjacent vertices. 
+
+Now, 
+
+
+
+
+
+Let's recall the conjucture as previously stated: 
+% \begin{conjecture}
+% Let \(G\) be a cubic graph with girth at least \(\girth{}\) for which there is an homomorphism \(h\) from \(G\) to \(CH\).
+% If \(\cost(h) > 0\),
+% then there is a cubic tree \(T\subseteq G\)
+% and a \(h\)-compatible homomorphism \(h'\) from \(T\) to \(CH\)
+% such that \(\cost(h') < \cost(h|_T)\).
+% \end{conjecture}
+
+
+
+First, let's assume that the tree $T$ is balanced.
