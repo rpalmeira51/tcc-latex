@@ -1,68 +1,110 @@
-\chapter{Disproving the conjuncture}
+\chapter{Disproving the conjuncture}\label{chap5}
+In this chapter, 
+we show that the Algorithmic Approach is unable to produce the desired results to proof Conjecture~\ref{conj:main-conjecture} 
+as Algorithm~\ref{alg:naive-conjecture-holds} (\texttt{GenerateUnsolvableConfs}) does not return zero regardless of the complete cubic tree passed as argument.
+We do this by introducing a process that generates a bad configuration for any complete cubic tree, regardless of its size.
+Therefore the negative results presented on Chapter~\ref{chap5} are not the consequence of insufficient computing power, 
+but a natural consequence of the properties of configurations.
 
-
-
+% Let $c(v)$ be the child vertices of $v$ 
+% $h(c(v))$ be $\{ h(c) | c \in c(v) } \}$
+% $p(u)$ be the \emph{possible colors} that $u$ can be colored with in respect to it's children.
 %
-%- Assume árvore binária completa  
-%- A gente pega dois vértices irmãos quaisquer
-%- Considera os 4 filhos deles e agora considera as cores possiveos para recoloris esses dois vértices 
-%
-%- Seja c^(-1) uma configuração de T^(-1), então há configuração c de T cuja única compleção dos pais de L(T) é c^(-1)
-%
-%- indução: se T tem altura 1. Então c^(-1) consiste apenas de uma cor. Seja a,b,c três vizinhos distintos de c^(-1) no Grafo de Clebsch. 
-%Suponha que T tem altura h, e seja c^(-1) = (f_1,...,f_k) uma coloração de L(T^(-1)).
-%Para cada f_i 
-%Para cada par u,v de irmãos em L(T^(-1)), sejam a,b, e c,d os filhos de u e v tal que os pares (a,b) e (c,d)   e c(a),c(u) $\in E(CH)$ ... 
-%observe que c(u) e c(v) são cores não adjacentes em CLEBSCH. 
-%Seja c(u') (resp. c(v')) uma cor não adjacente a c(u) (resp. c(v)) diferente de c(v) (resp. c(u))
-%tais que c(u') e c(v') são vizinhos. 
-%*** Seja c(u') e c(v') cores tais que (c(u), c(v'), c(u'), c(v)) induzem um P4 induzido em CLEBSCH.
-%Argumentar que isso é sempre possível.
-%Agora seja c(a) e c(b) (resp. c(c) e c(d)) os vizinhos em comum de c(u) e c(u') (resp. c(v) e c(v')).
-%Colora os filhos a,b de u com c(a) e c(b), e os filhos c,d de v com c(c) e c(d).
-%Isso nos dá uma configuração para T.
-%Observe que as únicas cores possíveis para u (reps. v) são c(u) e c(u') (resp. c(v) e c(v')). 
-%Como  (c(u), c(v'), c(u'), c(v)) induzem um P4 induzido em CLEBSCH,
-%e a cor c1 de u (resp. c2 de v) deve ser uma cor em \(\{c(u),c(u')\}\) (resp. \(\{c(v),c(v')\}\) tal que c1 e c2 não são adjacentes, então temos que c1 = c(u) e c2 = c(v). 
+\begin{lemma}
+Let $T_b$ be a complete binary tree of height at least two, 
+$conf$ a configuration of $T_b$, 
+$u$ and $v$ two siblings vertices of $L(T_b^{(-1)})$, 
+$\{w, x\}$ and $\{y, z\}$ the children of $u$ and $v$, respectively; 
+and $IG$ be the subgraph of $\ch$ induced by $(N_{conf(w)}~\cap~N_{conf(x)})~\cup~(N_{conf(y)}~\cap~N_{conf(z)}))$.
+
+If $IG$ is a $P_4$, then there is only one possible color $c_u$ for $u$ and $c_v$ for $v$ such that $c_u$ and $c_v$ have common neighbors 
+and, as consequence, there is no feasible configuration $conf^{(-1)}$ of $T_b^{(-1)}$ such that $conf^{(-1)}(u) \neq c_u$ or $conf^{(-1)}(v) \neq c_v$.
+\end{lemma}
+\begin{proof}
+Suppose the contrary is true, i.e, $IG$ is a $P_4$, but the statement does not hold.
+First, note that we have only two options $c_1$ and $c_2$ to color $u$ and two options $c_3$ and $c_4$ for $v$. 
+This can be easily deduced from Fact~\ref{fact:common_neighbors} and the observation that $|V(P_4)| = 4$.
+Also, that $c_1, c_2 \notin E(\ch)$ and $c_3, c_4 \notin E(\ch)$, because otherwise there would be triangles in $\ch$.
+Therefore all 3 edges of $IG$ are between $\{c_1,c_2\}$ and $\{c_3,c_4\}$, 
+thus, there is only one non edge $\{c_u,c_v\}$ between these partitions with $c_u \in \{c_1,c_2\}$ and $c_v \in \{c_3,c_4\}$.
+It is easy to see that $c_u$ and $c_v$ is a coloring for $u$ and $v$ and that $c_u$ and $c_v$ have common neighbors.
+Any other coloring of $u$ and $v$ with the same property would imply triangles on $\ch$, a contradiction.
+\end{proof}
+
+\begin{lemma}\label{lemma:pair-bad-coloring}
+   For every pair $\{c_u, c_v\}$ of non adjacent vertices in $\ch$, 
+   there are vertices $c_1, c_2$ adjacent to $c_u$ and 
+   vertices $c_3, c_4$ adjacent to $c_v$ 
+   such that $\{c_u, c_v\}$ is the only non edge between $N_{c_1}~\cap~N_{c_2}$ and $N_{c_3}~\cap~N_{c_4}$ 
+   on the induced $P4$ subgraph by $(N_{c_1}~\cap~N_{c_2})~\cup~(N_{c_3}~\cap~N_{c_4})$.
+\end{lemma}
+\begin{proof}
+We prove this by introducing a process that is always able to produce $c_1$, $c_2$, $c_3$ and $c_4$ such that the condition holds.
+Chose any $c_u$ and $c_v$ distinct and non adjacent.
+By Fact~\ref{fact:common_neighbors}, they have two common neighbors and tree distinct ones. 
+Without loss of generality, 
+choose $c_w$ to be one of the neighbors of $c_v$ which is not a neighbor of $c_u$ and 
+let $c_1, c_2$ be the two common neighbors of $c_u$ and $c_w$.
+Note that both $c_1$ and $c_2$ are not neighbors of $c_v$ as that would imply triangles.
+Then let $c_3, c_4$ be the common neighbors of $c_v$ and $c_1$, 
+we know that subgraph induced by $(N_{c_1}~\cap~N_{c_2})~\cup~(N_{c_3}~\cap~N_{c_4})$ is 
+the subgraph induced by $\{c_u, c_v, c_w , c_1\}$ which is a $P4$ with $\{c_u, c_v\}$, $\{c_u, c_w\}$, $\{c_v, c_1\}$ as non edges, 
+the first being the only between the partitions.
+\end{proof}
+
+The following corollary follows naturally.
+\begin{corollary}\label{coro:every-parents-configuration}
+For every feasible configuration $conf_b$ of a binary tree $T_b^{(-1)}$ with height greater than one, 
+if $conf_b$ colors sibling vertices distinctly,
+we can construct a configuration of $T_b$ such that its only parents configuration is $conf_b$.
+\end{corollary}
+
+\begin{lemma}\label{lemma:root-coloring}
+   Let $T_b$ be a binary tree rooted in $r$ with height $l$ greater than zero and $c_1$ and $c_2$ be two non adjacent vertices of $\ch$, 
+   there is always a configuration of $T_b$ for which there are only two completions $h_1$ and $h_2$ 
+   with $h_1(v) = h_2(v)$ for every $v$ in $V(T_b) \setminus \{r\}$, $h_1(r) = c_1$ and $h_2(r) = c_2$.
+\end{lemma}
+\begin{proof}
+   Lets proof by induction.
+   In the base case, 
+   $T_b$ has height one ($l$ = 1) with $r$ as root and vertices $v_1$ and $v_2$ as children. 
+   Then, it is enough to color $v_1$ and $v_2$ with the common neighbors of $c_1$ and $c_2$.
+   In the inductive step,
+   we know that the condition holds for $l-1$, i.e, $T_b^{(-1)}$ has a configuration $conf_b^{(-1)}$
+   for which there are only two completions $h_1$ and $h_2$ such that $h_1(v) = h_2(v)$ for every $v$ in $V(T_b^{(-1)}) \setminus \{r\}$, $h_1(r) = c_1$ and $h_2(r) = c_2$.
+
+   Then, by Corollary~\ref{coro:every-parents-configuration}, 
+   there is a feasible configuration $conf_b$ for which $conf_b^{(-1)}$ is the only parents configuration, 
+   therefore any completion of $conf_b$ must color $L(T^{(-1)})$ with $conf_b^{(-1)}$ and, 
+   as consequence, only two completions exist for $conf_b$. 
+\end{proof}
+
+\begin{lemma}\label{lemma:always-bad}
+   Given any complete cubic tree $T$ of arbitrary large size $l > 1$ there is at least one bad configuration of $T$.
+\end{lemma}
+\begin{proof}
+   Let $r$ be the root of $T$ and $u$, $v$ and $w$ the children of $r$.
+   Without loss of generality, chose any $b \in B_1$ 
+   and let $T_b$ be the complete binary tree obtained by removing $u$ and all vertices for which the shortest path to $r$ includes $u$.
+   Let $c_v$ and $c_w$ be the common neighbors of $b$ and any other color $c_1$ and fix $conf_b$ to be a configuration for which all completions 
+   color $v$ with $c_v$ and $w$ with $c_w$~(See~Lemma~\ref{lemma:root-coloring}).
+   Note that $b$ has five neighbors, two in common with $c_1$ and tree that are neighbors of $b$, but not of $c_1$.
+   Let $c_2$ and $c_3$ be two from the latter 
+   and $T_{b_2} \subset T$ be the binary subtree rooted in $u$ such that $T_{b_2} \cup T_b = T$.
+   We know there is a configuration $conf_{b_2}$ such that $u$ can only be colored with $c_2$ or $c_3$ (See Lemma~\ref{lemma:root-coloring}). 
+   Note that the intersection of the neighborhood of $c_2$, $c_v$ and $c_w$ is $b$ and the same is true for $c_3$, $c_v$ and $c_w$.
+   Therefore we have that $r$ can only be colored with $b$ in any completion, 
+   and, as consequence, the configuration $conf$ of $T$ formed by coloring every leaf of $T$ in $T_b$ with $conf_b$ 
+   and every leaf in $T_{b_2}$ with $conf_{b_2}$ is bad.
+\end{proof}
+
+Lemma~\ref{lemma:always-bad} shows that for any arbitrary large complete cubic tree, there always will be at least one bad configuration.
+One can note that Algorithm~\ref{alg:naive-conjecture-holds} (\texttt{GenerateUnsolvableConfs}) fails to produce the desired results 
+if there are any \emph{unsolvable} bad configurations.
+However it follows from the definition that if a configuration of $T$ is solvable 
+there is good configuration $conf^+$ on a super tree $T^+ \supset T$ such that there is one completion $h$ for witch $h_{|L(T)} = conf$.
+Therefore Lemma~\ref{lemma:always-bad} also holds for unsolvable configurations \emph{mutatis mutandis}.
 
 
-For any pair $p$ of distinct non adjacent vertices of the Clebsch Graph, there are two and only two common neighbours of both vertices in $p$.  
+Consegui usar =).
 
-We shall call the \emph{extension} of a pair $p$, the induced subgraph formed by the vertices in $p$ and it's common neighbours.
-
-Now, let $p_1$ and $p_2$ be two distinct pairs of distinct non adjacent vertices of the Clebsch Graph and consider the induced subgraph $S$ formed by the common neighbors $u$ and $v$ of $p_1$ and $z$ and $w$ of $p_2$. 
-
-
-Let $o$ be a children ordering and suppose, without loss of generality, that $p_1$ is smaller than $p_2$ in this order and also that both pairs are ordered.
-
-Then let $T$ be a complete binary tree of height 2 rooted in $r$ and $conf$ be a any configuration in $T$ such that it's signature is the sequence formed by the two vertices in $p_1$ followed by the two in $p_2$. 
-
-We know that any $conf^{p}$ must color the first vertex with $u$ or $z$ and the second one with $z$ or $w$. 
-Note that $S$ is bipartite graph with $\{u,v\}$ and $\{z, w\}$ as the independent components.
-Then is easy to see that, if $conf$ is valid, there must be at least one non edge between the two partition such that the vertices of this non edge have common neighbours. 
-If there is precisely one non edge, the root can only be colored with the two colors adjacent to both vertices of the non edge for any completion of $conf$. 
-
-Given any pair of non adjacent vertices in $CH$, we can always construct a configuration $conf$ in $T$ such that all of its completions color $r$ with one of the pair's vertices. 
-
-
-
-We can always produce a configuration $conf$ such that completion of $conf$ can only color the root with any two non adjacent vertices. 
-
-Now, 
-
-
-
-
-
-Let's recall the conjucture as previously stated: 
-% \begin{conjecture}
-% Let \(G\) be a cubic graph with girth at least \(\girth{}\) for which there is an homomorphism \(h\) from \(G\) to \(CH\).
-% If \(\cost(h) > 0\),
-% then there is a cubic tree \(T\subseteq G\)
-% and a \(h\)-compatible homomorphism \(h'\) from \(T\) to \(CH\)
-% such that \(\cost(h') < \cost(h|_T)\).
-% \end{conjecture}
-
-
-
-First, let's assume that the tree $T$ is balanced.

@@ -21,6 +21,8 @@ A \emph{path} $P$ in a graph $G$ is a sequence of vertices $(x_1, \dots, x_k)$ s
 If all vertices in $P$ are distinct and $\{ x_1, x_k \} \in E(G)$, we call it a \emph{cycle} with size $k$.
 $G$ is \emph{connected}, if for every pair of vertices $u$ and $v$ in $G$, there is a path starting in $u$ and ending in $v$.
 
+TODO: [n]
+
 $C_n$ is a graph with $n$ vertices such that there is cycle $P=(x_1, \dots, x_n)$ and $E(C_n) =\{ \{x_i,x_{i+1}\} | 1 \leq i < n \} \cup \{\{x_1,x_n\}\}$. 
 It's easy to that $K_3$ and $C_3$ are the same graph show on Figure \ref{fig:k3}.
 The \emph{girth} $g$ of Graph $G$ is length of the the shortest cycle which is a subgraph of $G$.
@@ -28,7 +30,7 @@ If there is no such cycle, $G$ is \emph{acyclic} with girth $g= \infty$.
 
 We say that a graph is a \emph{tree} if it is acyclic and connected. Vertices in a tree are a called leafs nodes if their degree is one and internal otherwise.  
 
-For any graphs $G_1$ and $G_2$, an homomorphism is a function $h \colon G_1 \to G_2$ such that $\{h(u), h(v)\} \in E(G_2)$ for every edge $\{u, v\} \in E(G_1)$. 
+For any graphs $G_1$ and $G_2$, a homomorphism is a function $h \colon G_1 \to G_2$ such that $\{h(u), h(v)\} \in E(G_2)$ for every edge $\{u, v\} \in E(G_1)$. 
 
 Given graphs \(G\) and \(H\), an \emph{homomorphism} from \(G\) to \(H\)
 is a function \(h\colon V(G) \to V(H)\) for which \(h(x)h(y)\in E(H)\) whenever \(xy\in E(G)\).
