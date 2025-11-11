@@ -84,16 +84,18 @@
     \include{Textual/chapter02}    
     \include{Textual/chapter03}
     \include{Textual/chapter04}
-    \include{Textual/chapter0Results.tex}
-    \include{Textual/chapter05}
+    \include{Textual/chapterResults.tex}
+    \include{Textual/chapterConjecture.tex}
     \include{Textual/chapter06}
 
   \backmatter
-  %\nocite{*}
-  \bibliographystyle{coppe-unsrt}
-  \bibliography{thesis}
   \appendix
   \include{Pos-textual/appenA}
+
+  %\nocite{*}
+  \addcontentsline{toc}{chapter}{Bibliography}
+  \bibliographystyle{coppe-unsrt}
+  \bibliography{thesis}
 \end{document}
 
 Def: Dado conjunto de cores S e uma configuração conf, uma (S,conf)-coloração é uma coloração chi de uma árvore T tal que chi(raiz(T)) está em S, e chi(folhas(T)) = conf.

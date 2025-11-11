@@ -7,7 +7,8 @@
 \newcommand{\girth}{g}
 \newcommand{\dist}{{\rm dist}}
 % \newcommand{\samal}{{\v{S}}{\'a}mal} 
-\newcommand{\cleb}{Clebsch graph}
+\newcommand{\cleb}{Clebsch Graph}
+\newcommand{\ch}{{CH}} 
 
 \newcommand{\cost}{{\rm cost}}
 %
@@ -27,6 +28,17 @@
 % \item Perspectiva geral: recebemos um grafo cúbico que admite um homomorfismo a um grafo H, será que conseguimos evitar algum vértice adicionando uma condição na cintura de G?
 %
 % \end{itemize}
+
+
+Considerar que foi definido na introdução: 
+1. Homomorfismo 
+2. Árvore binaria/cubica completa ou não
+3. C5
+4. Grafo cúbico 
+5. Cintura 
+6. homomorfismos: se $G \to H$ e $H \to R$, então $G \to  R$
+7. Vizinhanca com $N_{vertice}$
+
 
 In what follows, if \(m\) is a function \(m\colon A \to B\) and \(A'\subseteq A\),
 we denote by \(m|_{A'}\) the restriction of \(m\) to \(A'\),
@@ -68,10 +80,6 @@ A key observation with respect to \(\ch\) that is used throughout the text is th
 
 This work concerns about the \emph{\nesetril{} Pentagon Problem} stated below. 
 
-% já definiu homorphism?
-% já definiu o C5?
-% Já definiu cubic graph?
-% já definiu cintura?
 \begin{conjecture}\label{conj:pentagon-problem}
     There is a constant \(g_0\in \mathbb{N}\) for which the following holds.
     If \(G\) is a cubic graph with girth at least \(g_0\),
@@ -105,7 +113,6 @@ Conjecture~\ref{conj:pentagon-problem} deals then with the remaining case of \(C
      \label{}
 \end{figure}
 
-\newcommand{\ch}{{CH}} 
 \newcommand{\chzero}{{CH_0}}
 \newcommand{\chone}{{CH_1}}
 As an approximate result, in a computer-assisted proof, \cite{devos2011high} showed that every graph $G$ with $\Delta(G) \leq 3 $ and girth at least 17 has a homomorphism to the \emph{Clebsch graph}
@@ -115,34 +122,27 @@ that can be computed by a liner time algorithm.
 Every graph of maximum degree 3 and girth at least 17 is homomorphic to $\ch$.
 \end{theorem}
 
-%TODO: falar que "It is then natural to consider other computer search methods in order to improve Theorem 2"
-
-% TODO falar em algum lugar da transitividade dos homomorfismos: se G -> H e H-> R, então G -> R
-
-% Observe ao removermos os vértices \(0,1,2,7,12\) do grafo de Clebsch, obtemos um grafo que admite um homomorfismo para o \(C_5\).
-% Assim, se há um homomorfismo de \(G\) ao grafo de Clebsch que evita tais vértices, há um homomorfismo de G para C_5.
-% Em particular, sejam V1,...,V5 as classes de um homomorfismo h^-: C^- = Clebsch-{0,1,2,7,12} -> C5, tais que os vértices de V_i são adjacentes apenas aos vértices de V_{i-1} e V_{i+1}, onde a soma nos índices é tomada módulo 5.
-% 
-We consider the possibility of building upon Theorem~\ref{thm:DevosSamal11} to get a stronger result towards Conjecture~\ref{conj:pentagon-problem} using the following simple observation:
+It is then natural to consider other computer search methods in order to improve Theorem~\ref{thm:DevosSamal11} and get a stronger result towards Conjecture~\ref{conj:pentagon-problem}.
+We construct ours from the following observation:
 there is a small set \(B\subseteq V(\ch)\) such that the graph obtained from \(\ch\) by removing the vertices in \(B\)
 is homomorphic to \(C_5\).
 Although there are several sets with the property above, in this work we use the set \(B_0 = \{0,1,2,7,12\}\),
 which we call the set of \emph{undesired colors},
 and we denote by \(\ch_0\) the graph obtained from \(\ch\) by removing the vertices in \(B_0\).
-It's not hard to check that \(CH_0\) has a homomorphism \(h_0\) to $C_5$\footnote{For example pick the graph classes \{4, 8\}, \{9,10,14\}, \{6,11,15\}, \{3, 13\}, \{5\}},
+It's not hard to check that \(\ch_0\) has a homomorphism \(h_0\) to $C_5$\footnote{For example pick the graph classes \{4, 8\}, \{9,10,14\}, \{6,11,15\}, \{3, 13\}, \{5\}},
 and hence, to solve Conjecture~\ref{conj:pentagon-problem}, it's enough to prove that there is a constant \(g_0\) for which every cubic graph with girth at least \(g_0\) has a homomorphism to \(CH_0\),
 i.e., a homomorphism to \(CH\) that avoids the vertices in \(B_0\).
-%
+
 The objective of this work is to explore computer assisted methods to 
 find a partial result in this direction.
 More specifically we want to find a minimum girth \(g_0\)
 for which all cubic graphs of girth at least $g_0$ have a homomorphism to 
 the graph \(\chone\) obtained from \(\ch\) by removing a non-empty subset $B_1 \subseteq B_0$. 
 
-
-We establish a theoretical framework for locally recoloring the extended neighborhood of a vertex, that, due to the high girth condition, is isomorphic to a tree, 
+To do this, we first establish a theoretical framework for locally recoloring the extended neighborhood of a vertex, that, due to the high girth condition, is isomorphic to a tree, 
 in order to avoid undesired colors.
-We use this framework to prove the trivial result that we can always remove one of the undesired vertices from any homomorphism from a cubic graph of girth at least $17$ to a degenerate form of Clebsch graph that contains a few triangles. Furthermore, we try unsuccessfully to use it to remove a color from any homomorphism from a cubic graph of girth at least $g$ to the Clebsch graph,
+We, then, use this framework to prove the trivial result that we can always remove one of the undesired vertices from any homomorphism from a cubic graph of girth at least $17$ to a degenerate form of Clebsch graph that contains a few triangles.
+Furthermore, we try unsuccessfully to use it to remove a color from any homomorphism from a cubic graph of girth at least $g$ to the Clebsch graph,
 and present some statistical results regarding the number of \emph{configurations} (see Section~\ref{sec:configurations})
 that can be ``improved'' using this method.
 On the other hand, we present an infinite family of configurations that, independently of the girth, cannot be locally improved (see Chapter~\ref{chap5}).
@@ -154,20 +154,20 @@ as cycles, for which it is still not clear if the above intrinsically bad config
 
 \section{Theoretical foundation}\label{sec:theoretical-foundation}
 
-In order to avoid undesired colors, we need to 
+Recall that we are establishing a framework for exploring computer search methods that recolor homomorphisms to $\ch$ in order to avoid undesired colors.
+For this, we need to be able to define a quantitative way to compare colorings on how they avoid these undesired colors and we use the simple way of counting undesired colors for each coloring.
 
-Let \(G\) be a subcubic graph, and let \(h\) be a homomorphism $G \to \CH$.
+Let \(G\) be a subcubic graph, let \(h\) be a homomorphism $G \to \ch$ and fix $B_1 \subseteq B_0$.
 We define the \emph{cost} of $h$ as 
-\[\cost(h)~=~|\{x : \text{ for all } x \in V(G) \text{ and } h(x) \in B_1 \}|.\] 
+\[\cost(h)~=~|\{x\in V(G) : h(x)\in B_1\}|.\] 
 
 Observe that, if \(\cost(h) = 0\), then \(h\) avoids the vertices in \(B_1\),
 and hence, as observed in Section~\ref{sec:the-pentagon-problem},
 \(h\) is a homomorphism from $G$ to $\chone$.
 
-
 Now, let \(G\) be a cubic graph,
 let \(T\subseteq G\) be a cubic tree,
-and suppose that exists a homomorphism \(h \colon G \to \ch\).
+and suppose there is a homomorphism \(h \colon G \to \ch\).
 We say that a homomorphism \(h' \colon T \to \ch\) is \(h\)-\emph{compatible} if \(h'|_{L(T)} = h|_{L(T)}\),
 i.e., if \(h'(x) = h(x)\) for every \(x\in L(T)\),
 and we define the \((h,h')\)-\emph{modified} map $h^* \colon G \to \ch$ by
@@ -180,7 +180,7 @@ h^*(v) =
 \]
 
 By the definition of \(h\)-compatible, 
-if \(d_T(u) = d_G(u)\) for every vertex of \(T\) that is not a leaf, 
+if \(d_T(u) = d_G(u)\) for every internal vertex of \(T\), 
 then $h^*$ is a homomorphism from \(G\) to \(CH\).
 Indeed, let \(uv\in E(G)\). 
 If \(uv\in E(T)\), then \(h'(u)h'(v) \in E(CH)\) because \(h'\) is a homomorphism from \(T\) to \(CH\).
@@ -189,36 +189,21 @@ If both $u$ and $v$ are in $V(G) \setminus V(T)$ we have $h^*(u)h^*(v) = h(u)h(v
 If $u \in V(T)$ and $v \in V(G) \setminus V(T)$, then $u$ is a leaf of $T$.
 By the definition of \(h\)-compatible we have $h'(u) = h(u)$ and hence $h^*(u)h^*(v) = h(u)h(v)$ which is in \(E(CH)\) because \(h\) is is a homomorphism from \(G\) to \(CH\).
 
-%Definição alternativa de custo
-%Now, let \(G'\) be a subgraph of \(G\), 
-%and let \(m\colon V(G')\to V(H)\).
-%We define the \(\cost(m)\) as the number of elements of \(V(G')\) mapped to $0$,
-%i.e., the size of \(\{x\in V(G') : m(x) = 0\}\).
 The following lemma comes naturally.
 
 \begin{lemma}\label{lemma:cost-improvement}
-    Let \(G\) be a cubic graph for which there is a homomorphism \(h\) from \(G\) to \(CH\), let $T \subseteq G$ a cubic tree, $h'$ a $h$-compatible homomorphism from $T$ to $\ch$,
+    Let \(G\) be a cubic graph for which there is a homomorphism \(h\) from \(G\) to \(CH\), let $T \subseteq G$ a cubic tree, $h'$ an $h$-compatible homomorphism from $T$ to $\ch$,
     and let \(h^*\) be the \((h,h')\)-modified homomorphism,
     then \[\cost(h^*) = \cost(h) - \cost(h|_T) + \cost(h').\]
 \end{lemma}
 
-% Similarly, if both $u$ and $v$ are in $G \setminus T$ we have $(h_1(u), h_1(v)) = (c(u), c(v)) $ which by definition is in $E(H)$. If $u \in T$ and $v \in G \setminus T$ we have that necessarily u is a leaf of $T$ and therefore, by the definition of \(c\)-\(\compatible\), $ c_2(u) = c(u)$ and $(h_1(u), h_1(v)) = (c(u), c(v)) $ which by definition is in $E(H)$. 
-% We also have that : 
-%%%USAR ALIGN AQUI
-% $$
-% cost(h_1) = | \{x\in V(G) : h_1(x)\in\bads\} | 
-% $$
-% \[= | \{x\in V(G \setminus T) : c(x)\in\bads\} | + | \{x\in V(T) : c_2(x)\in\bads\} | \]
-% \[= | \{x\in V(G) : c(x)\in\bads\} | -  |\{x\in V(T) : c(x)\in\bads\} | + cost(c_2) \]
-% \[= cost(c) - | \{x\in V( T) : c(x)\in\bads\} | + cost(c_2) \]
-% \[= cost(c) - cost(c|_T) + cost(c_2) \]
 \begin{proof}
     \begin{align*}
     \cost(h^*) 
-        & = | \{x\in V(G) : h^*(x)\in\bads\} | \\
-        & = | \{x\in V(G) \setminus V(T)) : h(x)\in\bads\} | + | \{x\in V(T) : h'(x)\in\bads\} | \\
-        & = | \{x\in V(G) : h(x)\in\bads\} | -  |\{x\in V(T) : h(x)\in\bads\} | + cost(h') \\
-        & = \cost(h) - | \{x\in V( T) : h(x)\in\bads\} | + cost(h') \\
+        & = | \{x\in V(G) : h^*(x)\in B_1\} | \\
+        & = | \{x\in V(G) \setminus V(T)) : h(x)\in B_1\} | + | \{x\in V(T) : h'(x)\in B_1\} | \\
+        & = | \{x\in V(G) : h(x)\in B_1\} | -  |\{x\in V(T) : h(x)\in B_1\} | + cost(h') \\
+        & = \cost(h) - | \{x\in V( T) : h(x)\in B_1\} | + cost(h') \\
         & = \cost(h) - \cost(h|_T) + \cost(h') \qedhere.
     \end{align*}
 \end{proof}
@@ -226,18 +211,20 @@ The following lemma comes naturally.
 Now, suppose that \(h\) is a homomorphism from \(G\) to \(\ch\) 
 that minimizes \(\cost(h)\).
 Let \(T\subseteq G\) be a cubic tree,
-and let \(h'\) be a \(h\)-compatible homomorphism of \(T\).
+and let \(h'\) be an \(h\)-compatible homomorphism of \(T\).
 %
 Consider the \((h,h')\)-modified homomorphism \(h^*\).
 If \(\cost(h') < \cost(h|_T)\), then \(h^*\)
-is a homomorphism of \(G\) in \(\CH\) for which, by Lemma~\ref{lemma:cost-improvement}, we have \[\cost(h^*) = \cost(h) - \cost(h|_T) + \cost(h') < \cost(h),\]
-a contradiction to the minimality of \(h\).
-Therefore, for every cubic tree \(T\subseteq G\) there is no \(h\)-compatible homomorphism \(h'\) of \(T\) for which \(\cost(h') < \cost(h|_T)\).
+is a homomorphism \(G \to \ch\) for which, by Lemma~\ref{lemma:cost-improvement}, we have: 
+\[\cost(h^*) = \cost(h) - \cost(h|_T) + \cost(h') < \cost(h).\]
+
+Which is contradiction to the minimality of \(h\).
+Therefore, for every cubic tree \(T\subseteq G\), there is no \(h\)-compatible homomorphism \(h'\) of \(T\) for which \(\cost(h') < \cost(h|_T)\).
 This yields the following lemma
 
 \begin{lemma}\label{lemma:there-is-no-improvement}
-Let \(G\) be a cubic graph with girth at least \(\girth{}\),
-and let \(h\) be a homomorphism from \(G\) to \(CH\) 
+Let \(G\) be a cubic graph
+and \(h\) be a homomorphism from \(G\) to \(CH\) 
 that minimizes \(\cost(h)\).
 Now, let \(T\subseteq G\) be a cubic tree. 
 Then there is no \(h\)-compatible homomorphism \(h'\colon T \to CH\)
@@ -250,22 +237,17 @@ The methods developed in this work mean to explore the following conjecture.
 Let \(G\) be a cubic graph with girth at least \(\girth{}\) for which there is a homomorphism \(h\) from \(G\) to \(CH\).
 If \(\cost(h) > 0\),
 then there is a cubic tree \(T\subseteq G\)
-and a \(h\)-compatible homomorphism \(h'\) from \(T\) to \(CH\)
+and an \(h\)-compatible homomorphism \(h'\) from \(T\) to \(CH\)
 such that \(\cost(h') < \cost(h|_T)\).
 \end{conjecture}
 
 If Conjecture~\ref{conj:main-conjecture} holds,
-then if \(h\) is a homomorphism from \(G\) to \(CH\) 
-that minimizes \(\cost(h)\),
-then \(\cost(h) = 0\).
+then any homomorphism \(h \colon G \to CH\)
+that minimizes \(\cost(h)\)
+has \(\cost(h) = 0\).
 Therefore, as a natural consequence of Lemma~\ref{lemma:cost-improvement} and Conjecture~\ref{conj:main-conjecture}, we have the following.
 
-%TODO: revisar isso quando checar se a prova funciona para H no lugar de H^+
 \begin{theorem}\label{thm:main}
-    % Suppose that Conjecture~\ref{conj:main-conjecture} holds.
-    % If \(G\) is a cubic graph of girth at least \(\girth\),
-    % then there is a homomorphism from $G\to CH_1$.
-% 
     If Conjecture~\ref{conj:main-conjecture} holds,
     then every cubic graphs with girth at least \(\girth\) has a homomorphism to \(\chone\).
 \end{theorem}
@@ -276,12 +258,11 @@ By Theorem~\ref{thm:DevosSamal11}, there is a homomorphism from \(G\) to \(CH\).
 Let \(h\) be a homomorphism from \(G\) to \(CH\) that minimizes \(\cost(h)\).
 Suppose \(\cost(h) > 0\). 
 If Conjecture~\ref{conj:main-conjecture} holds, then there is a cubic tree \(T\subseteq G\)
-and a \(h\)-compatible homomorphism \(h'\) from \(T\) to \(CH\)
+and an \(h\)-compatible homomorphism \(h'\) from \(T\) to \(CH\)
 such that \(\cost(h') < \cost(h|_T)\).
 Now, let \(h^*\) be the \((h,h')\)-modified homomorphism from \(G\) to \(CH\).
 By Lemma~\ref{lemma:cost-improvement}, we have \(\cost(h^*) = \cost(h) - \cost(h|_T) + \cost(h') < \cost(h)\),
 a contradiction to the choice of \(h\).
 Therefore, we have \(\cost(h) = 0\), and hence \(h\) is a homomorphism from \(G\) to \(\chone\) as desired.
 \end{proof}
-
 

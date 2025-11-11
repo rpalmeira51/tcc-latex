@@ -1,9 +1,9 @@
-\chapter{The Algorithmic Argument}
+\chapter{The Algorithmic Approach}\label{chap:alg-approach}
 
 In this chapter we explore structures and algorithms that encapsulate a brute force process of finding \((h,h')\)-modified homomorphisms from \(G\) to \(CH\) 
 with improved costs over $h$.
-We, also, show that positive results of the presented algorithms proves Conjecture~\refconj:main-conjecture} and present a simple complexity analysis. 
-We use a python inspired pseudo-code to specify the algorithms for ease of reading (and also because we implemented a checker in Sage math see Chapter~\ref{chap:4}).
+We, also, show that positive results of the presented algorithms proves Conjecture~\ref{conj:main-conjecture} and present a simple complexity analysis. 
+We use a python inspired pseudocode to specify the algorithms for ease of reading (and also because we implemented a checker in SageMath see Chapter~\ref{chap:4}).
 
 \section{Configurations}\label{sec:configurations}
 
@@ -27,7 +27,6 @@ are, respectively, the values:
 %
 In the case that there is no completion \(h\) of conf such that \(h(r) \in B_1\), 
 we set \(RC(conf) = \infty\) and, more generally, if there is no completion for any root color $FC(conf) = RC(conf) = \infty$ and the configuration is unfeasible.
-
 \end{definition}
 
 The later case of Definition~\ref{def:conf-costs}, 
@@ -39,29 +38,26 @@ and if \(conf(r) \notin B_1\), then we have \(FC(conf) = 0\)
 while \(RC(conf) = \infty\) because the set \(\{h : h \in RH(conf)\text{ and } h(r) \in B_1)\}\) is empty.
 
 Observe that \(FC(conf) \leq RC(conf)\) for every configuration conf of a tree~\(T\).
-We say that that a configuration \emph{\(conf\) is bad} if equality holds, 
+We say that a configuration \emph{\(conf\) is bad} if equality holds, 
 i.e., if \(FC(conf) = RC(conf)\);
 and we say that a configuration \emph{$conf$ is good}, otherwise, i.e., if $FC(conf) < RC(conf)$.
 
 The next lemma is a straightforward consequence of the definition above.
 
-%Let $T$ and $T'$ be trees such that $T' \subseteq T$,  $c_1 \colon L(T) \to V(H)$ and $c_2 \colon L(T') \to V(H)$, we say that $c_1$ is \emph{descendent} of $c_2$ if there is a homomorphism $h \colon T \to H$ such that $h \in RH(c_1)$ and $h_{|T'} \in RH(c_2)$. 
-
 \begin{lemma}\label{lemma:every-good-configuration}
-    Let \(G\)  be a graph, $T$ be cubic tree in $G$ with root \(r\), 
-    and $h \colon G \to CH$ be a homomorphism with $h(r) \in B_1$, 
-    and let \(conf = h|_{L(T)}\).
-    If $conf$ is good, then there is an $h$-compatible homomorphism $h'\colon T \to CH$ such that $cost(h') < cost(h|_{T} )$.
+    Let \(G\) be a graph with girth $g$,
+    $T$ be a cubic tree in $G$ of size $\ell < g$ rooted in \(r\),
+    $h \colon G \to CH$ be a homomorphism with $h(r) \in B_1$
+    and \(conf = h|_{L(T)}\).
+    If $conf$ is good, then there is an $h$-compatible homomorphism $h'\colon T \to CH$ such that $cost(h') < cost(h|_{T})$.
 \end{lemma}
 
-TODO: Duvida para o fabio, provamos por contradicao aqui ? 
-
-Naturally, it follows that, if all feasible configuration on a given tree $T$ of height $\ell$ are good, 
-we proof Conjecture~\ref{conj:main-conjecture} for any $G$ with $g$ bigger than $\ell$.
-As such 
-if we have an Algorithm that is able to calculate the free and restricted costs of configurations, 
+Naturally, it follows that, if all feasible configuration of a given tree $T$ of height $\ell$ are good, 
+we verify Conjecture~\ref{conj:main-conjecture} for any graph $G$ with girth larger than $\ell$.
+For example,
+if we have an algorithm that is able to calculate the free and restricted costs of configurations, 
 we are able to computationally determine the bad configurations on a cubic tree of any level 
-and, finding a $\ell$ for which there are none, proof Conjecture~\ref{conj:main-conjecture}.
+and, if we find a positive integer for $\ell$ for which there are none, we prove Conjecture~\ref{conj:main-conjecture}.
 
 Algorithm~\ref{alg:naive-bottom-up} (\texttt{GenerateBadConfs}) relying 
 on the aforementioned algorithm for calculating costs (\texttt{CalculateCosts}) defines this process in pseudocode.
@@ -72,7 +68,7 @@ but the representation works for any simple numerical labeling of tree leafs.
 We produce all configurations on the tree by iterating over all $|L(T)|^{16}$ possible colorings of the leafs and than check the costs to verify 
 if a given configuration is good, bad or unfeasible.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Returns all bad configurations on a given tree $T$}\label{alg:naive-bottom-up}
 \footnotesize
 \begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
@@ -88,10 +84,10 @@ def GenerateBadConfs(T):
 \end{minted}
 \end{algorithm}
 
-
 \newcommand{\parents}{\mathcal{P}}
 The need to computationally calculate the free and restricted costs motivates the following.
-Let $conf$ be a configuration on $T$, 
+Recall that \(T^{(1)} = T \setminus L(T) \), now,
+let $conf$ be a configuration of $T$, 
 a \emph{parents configuration} of \(conf\)
 is any configuration $conf^p$ of \(T^{(1)}\)
 for which there is a completion $h$ of \(conf\) with $h(L(T^{(1)})) = conf^p$. 
@@ -101,7 +97,7 @@ The set of parents configurations of \(conf\) is denoted by \(\parents(conf)\).
 Algorithm~\ref{alg:naive-bottom-up:parents} (ParentsConfigurations) 
 generates the parents configurations of any configuration $conf$ of a tree $T$ as follows.
 First, note that each parents configuration is a configuration of \(L(T^{(1)})\)
-such that each leaf \(\texttt{l}\) in \(L(T^{(1)})\) has a color adjacent to the colors of its children, 
+in which each leaf \(\texttt{l}\) in \(L(T^{(1)})\) has a color adjacent to the colors of its children, 
 i.e., \(\texttt{l}\) must receive a color that is in the intersection of the neighborhoods (in $\ch$)
 of the colors of its children.
 This results in a set of possible colors that each vertex in $L(T^{(1)})$ can be colored with. 
@@ -109,9 +105,25 @@ Then the Cartesian product\footnote{In Python the Cartesian product can be perfo
 Note that some of those configurations may be unfeasible as it is possible to choose colors for sibling vertices in $T^{(1)}$ such that the resulting configuration cannot be completed.
 The parents configurations of \(conf\)
 are precisely the feasible configurations in the Cartesian product of the possible colors.
-%TODO add "https://docs.python.org/3/library/itertools.html#itertools.product" no bib 
+The following lemma comes naturally.
+%TODO Verificar pontos finais: todo parágrafo, e toda equação centralizada tem que ser pontuada.
+\begin{lemma}\label{lemma:child-costs} 
+    Let $T$ be a complete tree with root \(r\), and $conf$ a configuration of~$T$.
+    If \(T\) has height $l\geq 1$, then the following hold.
+    \begin{itemize}
+    \item[] \(FC(conf) = cost(conf) + \min\{FC(conf^p) : conf^p \in \parents(conf)\} \); and 
+    \item[] \(RC(conf) = cost(conf) + \min\{RC(conf^p) : conf^p \in \parents(conf)\}\).
+    \end{itemize}
+    Consequently, a configuration \(conf\) is bad if and only if
+    \begin{align*}
+        & cost(conf) + \min\{FC(conf^p) : conf^p \in \parents(conf)\}\\
+        &= cost(conf) + \min\{RC(conf^p) : conf^p \in \parents(conf)\},\\
+        &  \min\{FC(conf^p) : conf^p \in \parents(conf)\}\\
+        &= \min\{RC(conf^p) : conf^p \in \parents(conf)\}.
+    \end{align*}
+\end{lemma}
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Returns iterator over parents configurations}\label{alg:naive-bottom-up:parents}
 \footnotesize
 \begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
@@ -129,32 +141,19 @@ def ParentsConfigurations(T, conf):
 \end{minted}
 \end{algorithm}
 
-The following lemma comes naturally.
-
-%TODO Verificar pontos finais: todo parágrafo, e toda equação centralizada tem que ser pontuada.
-\begin{lemma}\label{lemma:child-costs} 
-    Let $T$ be a complete tree with root \(r\), and $conf$ a configuration of~$T$.
-    If \(T\) has height $l\geq 1$, then the following hold.
-    \begin{itemize}
-    \item[] \(FC(conf) = \min\{FC(conf^p) + cost(conf^p): conf^p \in \parents(conf)\} \); and 
-    \item[] \(RC(conf) = \min\{RC(conf^p) + cost(conf^p): conf^p \in \parents(conf)\}\).
-    \end{itemize}
-    Consequently, a configuration \(conf\) is bad if and only if
-    \begin{align*}
-        & \min\{FC(conf^p) + cost(conf^p): conf^p \in \parents(conf)\}\\
-        &= \min\{RC(conf^p) + cost(conf^p): conf^p \in \parents(conf)\}.
-    \end{align*}
-\end{lemma}
-
 Therefore, if all parents configurations of  \(conf\) are good, 
 then \(conf\) is good and, 
 consequently, any bad configuration of a tree of height at least 1 has at least one bad parents configuration.
 
-We are now able introduce Algorithm~\ref{alg:naive-bottom-up:costs} (\textttt{CalculateCosts}) which is able calculate the costs of any configuration \(conf\) using a ``bottom-up'' recursive algorithm that 
-computes the free and restricted costs using the costs of each parents configuration of \(conf\)(See Lemma~\ref{lemma:child-costs}).
-The case where there a no parents configurations, i.e $conf$ is a coloring over the root or unfeasible, calculating the costs is trivial and follows directly from Definition~\ref{def:conf-costs}. 
+\phantomsection
+\refstepcounter{algorithm}
+\label{alg:naive-bottom-up:costs}
 
-\begin{algorithm}
+We are now able to introduce Algorithm~\ref{alg:naive-bottom-up:costs} (\textttt{CalculateCosts}) which calculate the costs of any configuration \(conf\) using a ``bottom-up'' recursive algorithm that 
+computes the free and restricted costs using the costs of each parents configuration of \(conf\)(See Lemma~\ref{lemma:child-costs}).
+The case where there a no parents configurations, i.e $conf$ is a coloring over the root or unfeasible, calculating the costs is trivial and follows directly from Definition~\ref{def:conf-costs}.
+
+\begin{algorithm}[H]
 \caption{A simple algorithm for calculating costs using a ``bottom-up'' strategy}\label{alg:naive-bottom-up:costs}
 \footnotesize
 \begin{minted}[xleftmargin=\parindent,linenos, breaklines, escapeinside=||,mathescape=true]{python}
@@ -177,38 +176,37 @@ def CalculateCosts(T, conf):
 
 \section{Replacements}\label{sec:replacements}
 
-Suppose we computed all bad configurations on a given tree $T$ of size $\ell$ as non empty set, 
-computing the bad configurations for a size $\ell + 1 $ is prohibitively time-consuming and, for each bad configuration, there is at least 
+Suppose we computed all bad configurations on a given tree $T$ of height $\ell$ and found out it is a non empty-set,
+computing the bad configurations of a tree of height $\ell + 1 $ is prohibitively time-consuming
+and, for each bad configuration of $T$, there is at least 
 one good configuration which colors just a few vertices differently.
-Naturally, this motivates the search for 
-a process that is able to, by local operations, 
-modify, while avoiding increasing costs, configurations in order to change the coloring of certain vertices.
-For this, we define \emph{replacements} as follows with deals with the simpler case of changing the color of a single vertex.
+This motivates the search for 
+a process that, using local operations, is able to modify, while avoiding increasing costs, configurations in order to change the coloring of certain vertices.
+For this, we define \emph{replacements} as follows, in order to deal with the simple case of changing the color of a single vertex.
 
-Let \(T\) be a complete binary tree rooted in \(r \in V(T)\), 
-let \(c_0 \in V(\ch)\) a color and \(C\subseteq V(\chone) \setminus \{c_0\} \) a set of \emph{target} colors.
+Let \(T\) be a complete \emph{binary} tree rooted in a vertex \(r \in V(T)\), 
+let \(c_0 \in V(\ch)\) be a color and \(C\subseteq V(\chone) \setminus \{c_0\} \) a set of \emph{target} colors.
 We call the pair $(c_0, C)$ a \emph{replacement with respect to \(T\)} if for every homomorphism $h \colon T \to CH$ with $h(r) = c_0$, there is a homomorphism $h_r$ such that:
 (i)~$h_r(r) \in C$; 
 (ii)~$h_r(L(T)) = h(L(T))$; and
 (iii)~$cost(h_r) \leq cost(h)$.
 
 The following lemma comes naturally.
-\begin{lemma}
-    Let $T$ be a complete binary tree of size $\ell$ and $(c_0,~C)$ a replacement with respect to $T$. 
-    Then~$(c_0,~C)$~is~a~replacement~for~any~complete~binary~tree~with~size~at~least~$\ell$.
+\begin{lemma}\label{lemma:replacements-monotonicity}
+    Let $T$ be a complete binary tree of height $\ell$ and $(c_0,~C)$ a replacement with respect to $T$. 
+    Then~$(c_0,~C)$~is~a~replacement~for~any~complete~binary~tree~with~height~at~least~$\ell$.
 \end{lemma}
 
-As an example, in what follows, we present a simple family of replacements.
+As an example we present a simple family of replacements.
 Let \(c_0\) be a color in $B_1$
-and let \(C\) the set $V(\ch) \setminus N_{\ch}(c_0) \setminus \{c_0\}$, 
-we call $(c_0, C)$ a \emph{trivial replacement} (See table \ref{table:replacements-height-1}).
+and \(C\) be the set $(V(\ch) \setminus N_{\ch}(c_0)) \setminus \{c_0\}$, 
+we say that $(c_0, C)$ is a \emph{trivial replacement} (see table \ref{table:replacements-height-1}).
 The following proposition arises.
 
 \begin{proposition}
     Every trivial replacement is a replacement with respect to the binary tree with~height~1.
 \end{proposition}
 \begin{proof}
-
 Let \((c_0,C)\) be a trivial replacement.
 We prove that \((c_0,C)\) is a replacement with respect to the complete binary tree \(T\) of height \(1\).
 Indeed, let \(r\) be the root of \(T\) and \(l_1,l_2\) be its leaves, 
@@ -235,7 +233,7 @@ as desired.
 % \hline
 % \multicolumn{3}{| c |}{}\\
 \hline
-c_0 & C \\
+$c_0$ & C \\
 \hline
 0 &  \{2, 3, 4, 5, 7, 9, 11, 12, 14, 15\}  \\
 \hline
@@ -252,11 +250,24 @@ c_0 & C \\
 \end{tabular}
 \end{table}
 
-We are able to determine if a pair $(c_0, C)$ is a replacement for a given complete binary tree $T$ computationally
+The next lemma follows directly from the definition.
+\begin{lemma}\label{lemma:replacements-subseteq}
+    Let $T$ be a complete binary tree of height $\ell$ and $(c_0,~C)$ a replacement with respect to $T$. 
+    Then any pair $(c_0, C_i)$ where $C \subseteq C_i$ and $ C_i \subseteq V(\chone)$ is a replacement.
+\end{lemma}
+
+This enable us to introduce \emph{minimal replacements}.
+\begin{definition}\label{def:minimal-replacements}
+    Let $T$ be a complete binary tree of height $\ell$ and $(c_0,~C)$ a replacement with respect to $T$. 
+    We call $(c_0,~C)$ a \emph{minimal replacement} 
+    if there is no replacement $(c_0,~C_i)$ in respect to $T$ such that $C_i \subset C$.
+\end{definition}
+
+Note that we are able to determine if a pair $(c_0, C)$ is a replacement for a given complete binary tree $T$ computationally
 by verifying that every homomorphism $h$ that completes a configuration of $T$ such that $h(r)= c_0$ is related to a homomorphism $h_r$ such that $h_r(r) \in C$ and $cost(h_r) \leq cost(h)$. 
 The following Algorithm~\ref{alg:naive-replacements:check} (CheckReplacement) implements this process.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{CheckReplacement}\label{alg:naive-replacements:check}
 \footnotesize
 \begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
@@ -284,42 +295,74 @@ def MinCostWithRoots(T, conf, possibleRoots):
 \end{minted}
 \end{algorithm}
 
-\subsection{Similar and solvable configurations}
+\subsection{Similar and solvable configurations}\label{sec:similar-and-solvable}
+% TODO:
+% X SIMiLAR x na formula
+% X Substitution ao inves de substitute
+% definir $conf {x \to c}$
+% No lugar de substitute, Dada uma cor c, a gente escreve $conf {x \to c}$ para a configuração obtida de conf colorindo x com c.
+% Usar custos no paragrafo seguinte
+% if...define errado, tem que ser suppose...define
+% Subs(conf)
+% nao precisa dizer que é feasible
+% elementary substitutions -> uma substituição elementar 
+%======
+In what follows, 
+suppose $conf$ is a configuration of a tree $T$,
+then $conf_{x \to c}$ is the configuration $conf^*$
+such that $conf^*(x)=c$ and $conf^*(y) = conf(y)$ for every $y \in L(T) \setminus \{x\}$ where $x \in L(T)$.
 
-Given a tree \(T\), 
+Let $T$ be cubic tree,
 we say that two configurations \(conf_1\) and \(conf_2\) of \(T\)
 are \emph{similar} if \(conf_1(x) \neq conf_2(x)\)
 for precisely one \(x\in L(T)\), 
-i.e., if \(|\{x\in L(T) : conf_1(x) \neq conf_2(x)\}| = 1\).
-Equivalently, we say that \(conf_2\) is \emph{similar to} \(conf_1\) and, additionally, \emph{similar in respect} to $x$.
-A \emph{substitute} of \(conf\) is a configuration \(conf_*\) similar to \(conf\) such that $RC(conf_*) \leq RC(conf)$.
-%
-%Now, given a cubic graph $G$, a homomorphism $h \colon G \to CH$, a cubic tree $T \subseteq G$, let $conf = h|_{L(T)}$.
-% Now, given a cubic tree $T \subseteq G$, and a homomorphism $h \colon T \to CH$, let $conf$ be a configuration completed by $h$.
+i.e., \(|\{y\in L(T) : conf_1(y) \neq conf_2(y)\}| = 1\).
+Equivalently, we say that \(conf_2\) is \emph{$x$-similar} to \(conf_1\).
 
-Let be $(c_0, C)$ be a replacement, $conf$ a configuration of $T$, $x \in L(T)$ with $conf(x) = c_0$ and 
-\(conf_{x\to c}\) the configuration obtained from \(conf\) by coloring \(x\) with \(c\).
-If for each color $c \in C$, \(conf_{x\to c}\) is a substitute of $conf$, 
-we define the set formed by these substitutes as a \emph{Substitution} of $conf$.
-We call a configuration $conf$ solvable if we can construct a tree such that 
-every node is a feasible configuration, 
-the root is $conf$, 
-the children of every internal node are a Substitution of the node's configuration 
-and all node leafs are good configurations.
-Additionally, we call this tree a \emph{Substitution tree}.
+Moreover,
+let
+$T$ be cubic tree,
+$x$ a vertex such that $x \in L(T)$,
+$T_{b}$ a complete binary tree of size $\ell$ such that $T \cap T_{b} = \{x\}$,
+$conf$ a configuration of $T$
+and 
+$R$ be a replacement $(conf(x), C)$ in respect to $T_b$,
+then $conf^*$ is \emph{$(x,R)$-similar to $conf$} if $conf^* \in \{conf_{x \to c} | c \in C \}$. 
+Note that every configuration $(x,R)$-similar to $conf$ is also $x$-similar to $conf$.
+We say that a configuration $conf*$ is a substitution for $conf$ if it is $(x, R)$-similar to $conf$ and $RC(conf^*) \leq RC(conf)$ 
+for some fixed $x$ and $R$.
+Additionally,
+we say that $conf$ is \emph{solvable} for $\ell$
+if
+$conf$ is bad
+and
+there is $R=(conf(x), C)$ a replacement in respect to $T_{b}$,
+such that for every $c \in C$, the configuration $conf_{x \to c}$ is a substitution and is good or solvable.
+In what follows we fix $\ell_b > 0$ such that every replacement is 
+in respect to a complete binary tree of size $\ell_b$
+and recall that, by Lemma~\ref{lemma:replacements-monotonicity}, for this
+it is enough to show that a replacement is in respect to any complete binary tree of size smaller then $\ell_b$.
+With this, we say that a configuration is solvable if it is solvable for the fixed $\ell_b$.
+Now, we call each pair $(x, R)$ that makes $conf$ solvable the \emph{solvability parameters} of $conf$.
 
-Note that, if for any given configuration $conf$, 
-there is a Substitution such that all substitutes in the set are good or known solvable, 
-we can form a Substitution tree rooted in $conf$.
+Moreover,
+the \emph{solvability complexity} of $conf$, 
+denoted by $sc(conf)$, is defined to be 
+0 if $conf$ is good, 
+$\infty$ if bad and not solvable 
+and, if $conf$ is solvable, $k+1$ where $k = min(\{k(x, R) | \text{ for each solvability parameters } (x, R)\})$,
+and $k(x, R)$ is the maximum solvability complexity of every $(x, R)$-similar configuration to $conf$.
+
+Therefore a configuration is solvable if and only if its solvability complex is finite and bigger then zero.
+
 Algorithm~\ref{alg:naive-replacements} (GetCurrentLevelSubstitutions) 
-tries to find a \emph{Substitution tree} for each input bad configuration 
-by determining, for each one, if there is a vertex $x$ for which there are substitutes in respect to $x$ 
-such that there is a replacement $(c_0, C)$ where $x$ is colored with $c_0$ in the original configuration 
-and every color in $C$ is the color of $x$ in at least one of the substitutes.
-It does that, by first calculating the substitutes with respect to all vertices for each input bad configuration 
-and then checking if there is replacement such that the set of these substitutes in respect to any vertex form a Substitution.
+tries to improve bad configurations by checking if they are a solvable.
+For each bad configuration $conf$, it traverses leaf vertices and, for each one $x$, 
+finds every $x$-similar configuration which is good or solvable and doesn't increase the restricted cost.
+We call a \emph{replacement candidate} the pair formed by $conf(x)$ and the set $C_{cand}$ of these $x$-similar configurations.
+Later, it checks if one of the replacement candidates is a replacement and, therefore, $conf$ is solvable.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{GetCurrentLevelSubstitutions}\label{alg:naive-replacements}
 \footnotesize
 \begin{minted}[xleftmargin=\parindent,linenos,escapeinside=||,mathescape=true]{python}
@@ -336,10 +379,10 @@ def GetCurrentLevelSubstitutions(T, bads, knownSolvable):
                 bad[i] = newColorToTest
                 #the similar configuration free and restricted costs
                 sfc, src  = CalculateCosts(T, bad)
-                #not a substitute
+                #cannot be a substitution
                 if(src > rc):
                     continue
-                #not a root of a substitution tree
+                # is bad and not know to be solvable
                 if(bad not in knownSolvable and sfc == |$\infty$| or sfc == src):
                     continue 
                 C.append(newColorToTest)
@@ -354,30 +397,85 @@ def GetCurrentLevelSubstitutions(T, bads, knownSolvable):
     return solvableBads, unsolvableBads
 \end{minted}
 \end{algorithm}
-
-
 The next lemma generalizes Lemma~\ref{lemma:every-good-configuration}.
 
+
+%TODO girth on G previous lemmas
 \begin{lemma}\label{lemma:every-good-and-solvable-configuration}
-Let \(G\) be a graph, $T \subseteq G$ a complete cubic tree rooted in $r$, 
-and $h \colon G \to \ch$ be a homomorphism with $cost(h(r))>0$. 
-If $conf = h|_{L(T)}$ is good or solvable, 
-then \(T\) can be extended to a tree \(T^+ \subseteq G\)
-for which there is $h$-compatible homomorphism $h'\colon T^+ \to \ch$ such that 
+Let \(G\) be a graph with girth $g$,
+$T \subset G$ a complete cubic tree rooted in $r$ of size $\ell$,
+$h \colon G \to \ch$ be a homomorphism with $cost(h(r))>0$ 
+and $\ell_b > 0$ a fixed integer such that $\ell + \ell_b < g$.
+If $conf = h|_{L(T)}$ is good or solvable for $\ell_b$, 
+then \(T\) can be extended to a tree \(T^+ \subseteq G\) of size $\ell + \ell_b$
+for which there is a
+$h$-compatible homomorphism $h'\colon T^+ \to \ch$ such that 
  \(cost(h') < cost(h|_{T^+})\) and, moreover, $cost(h'(r))=0$.
 \end{lemma}
+
+\begin{proof}
+If $conf$ is good, just let $T^+ = T$ and we know it is true by Lemma~\ref{lemma:every-good-configuration}.
+On the remaining case that $conf$ is solvable, we know that $sc(conf) = n$ where n is finite and bigger than zero for the fixed $\ell_b$.
+We will prove on induction on $sc(conf)$.
+
+On the base case, $sc(conf) = 1$,
+therefore there is a vertex $x \in L(T)$ and replacement $R(conf(x), C)$ in respect to a complete binary tree of height $\ell_b$
+such that, for every $c \in C$, $conf_{x \to c}$ is good.
+Therefore, 
+let 
+$T^+$ be the tree $T$ extended to the height $\ell + \ell_b$,
+$T_{b}$ be the complete binary of size $\ell_b$ tree rooted in $x$ such that $T_{b} \subset T^+$ 
+and $T_{b} \cap T = \{x\}$.
+$R$ is a replacement in respect to $T_{b}$, therefore we know that exists a homomorphism $h_{T_{b}} \colon T_{b} \to \ch$ such that:
+(i)~$h_{T_{b}}(x) \in C$; 
+(ii)~$h_{T_{b}}(L(T_{b})) = h(L(T_{b}))$; and
+(iii)~$cost(h_{T_{b}}) \leq cost(h|_{T_{b}})$.
+Let $h_{T_{b}}(r)$ be, without loss of generality, $c \in C$, 
+$h_f \in RH(conf_{x \to c})$ be a homomorphism such that $cost(h_f) = FC(conf_{x \to c })$ 
+and $h'$ the homomorphism over $T^*$ defined as: 
+\[ 
+h'(v) = 
+     \begin{cases}
+        h_{T_{b}}(v) &\quad\text{if } v\in V(T_{b} \setminus \{x\})\\
+        h_f(v) &\quad\text{if } v \in V(T)\\
+        h(v) &\quad\text{if } v \in V(T^+ \setminus (T \cup T_{b})).
+     \end{cases}
+\]
+It follows that $h'(v)$ is 
+$h$-compatible homomorphism $h'\colon T^+ \to \ch$ such that 
+ \(cost(h') < cost(h|_{T^+})\) and, moreover, $cost(h'(r))=0$.
+
+Now, suppose $sc(conf) = n$ where $n > 1$ and we know that the proposition stands for every positive until $n$.
+Then there is a vertex $x \in L(T)$ and replacement $R(conf(x), C)$ in respect to a complete binary tree of height $\ell_b$,
+such that $max(\{ sc(conf_{x \to c}) | c \in C \}) = n-1$.
+Without loss of generality, suppose that the homomorphism $h_{T_{b}}$ that exists as consequence of $R$ 
+is such that $h_{T_{b}}(x) = c \ in C$ and $sc(conf_{x \to c}) = n-1$.
+Let $h_f \in RC(conf_{x \to c})$ be a homomorphism such that $cost(h_f) = FC(conf_{x \to c })$ 
+and $h'$ the homomorphism over $T^*$ defined as:
+\[
+h'(v) =
+     \begin{cases}
+        h_{T_{b}}(v) &\quad\text{if } v\in V(T_{b} \setminus \{x\})\\
+        h_f(v) &\quad\text{if } v\in V(T)\\
+        h(v) &\quad\text{if } v \in V(T^+ \setminus (T \cup T_{b})).
+     \end{cases}
+\]
+Then let $h^*$ be the $(h, h')$-modified homomorphism, note that 
+$h^*|_{L(T)} = conf_{x \to c}$ 
+and $sc(conf_{x \to c}) = n-1$, 
+therefore, by the induction hypothesis, there is a $h$-compatible homomorphism for which the condition holds.
+\end{proof}
 
 Now, we are able to introduce Algorithm~\ref{alg:naive-conjecture-holds} (\texttt{GenerateUnsolvableConfs}) 
 which is able to verify if there no unsolvable bad configurations 
 on given complete cubic tree by calling iteratively Algorithm~\ref{alg:naive-replacements} passing the new solvable configurations found on the previous step together with the previous already know solvable configurations.
 The algorithm stops 
 when there aren't any unsolvable bad configuration left, or
-when no more solvable configurations are found, since, in this case, any new call to Algorithm~\ref{alg:naive-replacements} produces the same result, 
-because no substitution tree was found in the previous steps and, therefore, can't be used as branch to construct new ones.
+when no more solvable configurations are found, since, in this case, any new call to Algorithm~\ref{alg:naive-replacements} produces the same result.
 
 By Lemma~\ref{lemma:every-good-and-solvable-configuration}, if we find a complete cubic tree of size $\ell$ such that Algorithm~\ref{alg:naive-conjecture-holds} (\texttt{GenerateUnsolvableConfs}) is unable to generate any unsolvable bad configuration, we computationally proof Conjecture~\ref{conj:main-conjecture}.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{GenerateUnsolvableConfs}\label{alg:naive-conjecture-holds}
 \footnotesize
 \begin{minted}[xleftmargin=\parindent,linenos, breaklines, escapeinside=||,mathescape=true]{python}
@@ -395,7 +493,7 @@ def GenerateUnsolvableConfs(T):
 \end{algorithm}
 
 
-\section{Complexity and Conclusion}\label{complexity-analysys}
+\section{Complexity and Conclusion}\label{sec:complexity-analysys}
 
 In this chapter we introduced two algorithms and proved that certain outputs verify Conjecture~\ref{conj:main-conjecture}.
 Unfortunately, both have clearly exponential behavior.

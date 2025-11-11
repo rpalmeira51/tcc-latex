@@ -1,8 +1,8 @@
-\chapter{Disproving the conjuncture}\label{chap5}
-In this chapter, 
-we show that the Algorithmic Approach is unable to produce the desired results to proof Conjecture~\ref{conj:main-conjecture} 
+\chapter{Disproving the conjecture}\label{chap6}
+In this chapter,
+we show that the algorithmic approach is unable to produce the desired results to prove Conjecture~\ref{conj:main-conjecture} 
 as Algorithm~\ref{alg:naive-conjecture-holds} (\texttt{GenerateUnsolvableConfs}) does not return zero regardless of the complete cubic tree passed as argument.
-We do this by introducing a process that generates a bad configuration for any complete cubic tree, regardless of its size.
+We do this by introducing a process that generates a bad configuration for any complete cubic tree, regardless of its height.
 Therefore the negative results presented on Chapter~\ref{chap5} are not the consequence of insufficient computing power, 
 but a natural consequence of the properties of configurations.
 
@@ -11,22 +11,22 @@ but a natural consequence of the properties of configurations.
 % $p(u)$ be the \emph{possible colors} that $u$ can be colored with in respect to it's children.
 %
 \begin{lemma}
-Let $T_b$ be a complete binary tree of height at least two, 
+Let $T_b$ be a complete binary tree of height at least 2, 
 $conf$ a configuration of $T_b$, 
 $u$ and $v$ two siblings vertices of $L(T_b^{(-1)})$, 
 $\{w, x\}$ and $\{y, z\}$ the children of $u$ and $v$, respectively; 
 and $IG$ be the subgraph of $\ch$ induced by $(N_{conf(w)}~\cap~N_{conf(x)})~\cup~(N_{conf(y)}~\cap~N_{conf(z)}))$.
 
-If $IG$ is a $P_4$, then there is only one possible color $c_u$ for $u$ and $c_v$ for $v$ such that $c_u$ and $c_v$ have common neighbors 
+If $IG$ is an induced copy of $P_4$, then there is only one possible color $c_u$ for $u$ and $c_v$ for $v$ such that $c_u$ and $c_v$ have common neighbors 
 and, as consequence, there is no feasible configuration $conf^{(-1)}$ of $T_b^{(-1)}$ such that $conf^{(-1)}(u) \neq c_u$ or $conf^{(-1)}(v) \neq c_v$.
 \end{lemma}
 \begin{proof}
-Suppose the contrary is true, i.e, $IG$ is a $P_4$, but the statement does not hold.
+Suppose, for a contradiction, that $IG \simeq P_4$, but the statement does not hold.
 First, note that we have only two options $c_1$ and $c_2$ to color $u$ and two options $c_3$ and $c_4$ for $v$. 
 This can be easily deduced from Fact~\ref{fact:common_neighbors} and the observation that $|V(P_4)| = 4$.
-Also, that $c_1, c_2 \notin E(\ch)$ and $c_3, c_4 \notin E(\ch)$, because otherwise there would be triangles in $\ch$.
-Therefore all 3 edges of $IG$ are between $\{c_1,c_2\}$ and $\{c_3,c_4\}$, 
-thus, there is only one non edge $\{c_u,c_v\}$ between these partitions with $c_u \in \{c_1,c_2\}$ and $c_v \in \{c_3,c_4\}$.
+Also, that $\{c_1, c_2\} \notin E(\ch)$ and $\{c_3, c_4\} \notin E(\ch)$, because otherwise there would be triangles in $\ch$.
+Therefore all three edges of $IG$ are between $\{c_1,c_2\}$ and $\{c_3,c_4\}$, 
+thus, there is only one non-edge $\{c_u,c_v\}$ between these partitions with $c_u \in \{c_1,c_2\}$ and $c_v \in \{c_3,c_4\}$.
 It is easy to see that $c_u$ and $c_v$ is a coloring for $u$ and $v$ and that $c_u$ and $c_v$ have common neighbors.
 Any other coloring of $u$ and $v$ with the same property would imply triangles on $\ch$, a contradiction.
 \end{proof}
@@ -35,39 +35,40 @@ Any other coloring of $u$ and $v$ with the same property would imply triangles o
    For every pair $\{c_u, c_v\}$ of non adjacent vertices in $\ch$, 
    there are vertices $c_1, c_2$ adjacent to $c_u$ and 
    vertices $c_3, c_4$ adjacent to $c_v$ 
-   such that $\{c_u, c_v\}$ is the only non edge between $N_{c_1}~\cap~N_{c_2}$ and $N_{c_3}~\cap~N_{c_4}$ 
-   on the induced $P4$ subgraph by $(N_{c_1}~\cap~N_{c_2})~\cup~(N_{c_3}~\cap~N_{c_4})$.
+   such that $\{c_u, c_v\}$ is the only non-edge between $N_{c_1}~\cap~N_{c_2}$ and $N_{c_3}~\cap~N_{c_4}$.
+   In other words, the graph induced by $(N_{c_1}~\cap~N_{c_2})~\cup~(N_{c_3}~\cap~N_{c_4})$ is a $P_4$.
 \end{lemma}
 \begin{proof}
 We prove this by introducing a process that is always able to produce $c_1$, $c_2$, $c_3$ and $c_4$ such that the condition holds.
 Chose any $c_u$ and $c_v$ distinct and non adjacent.
-By Fact~\ref{fact:common_neighbors}, they have two common neighbors and tree distinct ones. 
+By Fact~\ref{fact:common_neighbors}, they have only two common neighbors and $d(c_u) = d(c_v) = 5$.
 Without loss of generality, 
-choose $c_w$ to be one of the neighbors of $c_v$ which is not a neighbor of $c_u$ and 
+choose $c_w$ to be one of the neighbors of $c_v$ that is not a neighbor of $c_u$ and 
 let $c_1, c_2$ be the two common neighbors of $c_u$ and $c_w$.
 Note that both $c_1$ and $c_2$ are not neighbors of $c_v$ as that would imply triangles.
 Then let $c_3, c_4$ be the common neighbors of $c_v$ and $c_1$, 
 we know that subgraph induced by $(N_{c_1}~\cap~N_{c_2})~\cup~(N_{c_3}~\cap~N_{c_4})$ is 
-the subgraph induced by $\{c_u, c_v, c_w , c_1\}$ which is a $P4$ with $\{c_u, c_v\}$, $\{c_u, c_w\}$, $\{c_v, c_1\}$ as non edges, 
-the first being the only between the partitions.
+the subgraph induced by $\{c_u, c_v, c_w , c_1\}$ which is a $P_4$ with $\{c_u, c_v\}$, $\{c_u, c_w\}$, $\{c_v, c_1\}$ as non-edges, 
+the first non-edge being the only only between the partitions.
 \end{proof}
 
 The following corollary follows naturally.
 \begin{corollary}\label{coro:every-parents-configuration}
-For every feasible configuration $conf_b$ of a binary tree $T_b^{(-1)}$ with height greater than one, 
-if $conf_b$ colors sibling vertices distinctly,
-we can construct a configuration of $T_b$ such that its only parents configuration is $conf_b$.
+Let $conf_b$ be a feasible configuration of a binary tree $T_b^{(-1)}$ with height greater than 1. 
+If $conf_b$ colors sibling vertices distinctly,
+then
+we can construct a configuration of $T_b$ for which $conf_b$ it's its only parents configuration.
 \end{corollary}
 
 \begin{lemma}\label{lemma:root-coloring}
-   Let $T_b$ be a binary tree rooted in $r$ with height $l$ greater than zero and $c_1$ and $c_2$ be two non adjacent vertices of $\ch$, 
-   there is always a configuration of $T_b$ for which there are only two completions $h_1$ and $h_2$ 
+   Let $T_b$ be a binary tree rooted in $r$ with height $l$ greater than 0 and $c_1$ and $c_2$ be two non adjacent vertices of $\ch$.
+   There is a configuration of $T_b$ for which there are only two completions $h_1$ and $h_2$ 
    with $h_1(v) = h_2(v)$ for every $v$ in $V(T_b) \setminus \{r\}$, $h_1(r) = c_1$ and $h_2(r) = c_2$.
 \end{lemma}
 \begin{proof}
-   Lets proof by induction.
-   In the base case, 
-   $T_b$ has height one ($l$ = 1) with $r$ as root and vertices $v_1$ and $v_2$ as children. 
+   The proof follows.
+   If
+   $T_b$ has height one ($l$ = 1) and, by consequence, we have vertices $v_1$ and $v_2$ children of $r$. 
    Then, it is enough to color $v_1$ and $v_2$ with the common neighbors of $c_1$ and $c_2$.
    In the inductive step,
    we know that the condition holds for $l-1$, i.e, $T_b^{(-1)}$ has a configuration $conf_b^{(-1)}$
@@ -80,7 +81,7 @@ we can construct a configuration of $T_b$ such that its only parents configurati
 \end{proof}
 
 \begin{lemma}\label{lemma:always-bad}
-   Given any complete cubic tree $T$ of arbitrary large size $l > 1$ there is at least one bad configuration of $T$.
+   Given any complete cubic tree $T$ of arbitrary large height $\ell > 1$ there is at least one bad configuration of $T$.
 \end{lemma}
 \begin{proof}
    Let $r$ be the root of $T$ and $u$, $v$ and $w$ the children of $r$.
@@ -92,19 +93,15 @@ we can construct a configuration of $T_b$ such that its only parents configurati
    Let $c_2$ and $c_3$ be two from the latter 
    and $T_{b_2} \subset T$ be the binary subtree rooted in $u$ such that $T_{b_2} \cup T_b = T$.
    We know there is a configuration $conf_{b_2}$ such that $u$ can only be colored with $c_2$ or $c_3$ (See Lemma~\ref{lemma:root-coloring}). 
-   Note that the intersection of the neighborhood of $c_2$, $c_v$ and $c_w$ is $b$ and the same is true for $c_3$, $c_v$ and $c_w$.
+   Note that the intersection of the neighborhood of $c_2$, $c_v$ and $c_w$ is $b$ and the same holds for $c_3$, $c_v$ and $c_w$.
    Therefore we have that $r$ can only be colored with $b$ in any completion, 
    and, as consequence, the configuration $conf$ of $T$ formed by coloring every leaf of $T$ in $T_b$ with $conf_b$ 
    and every leaf in $T_{b_2}$ with $conf_{b_2}$ is bad.
 \end{proof}
 
-Lemma~\ref{lemma:always-bad} shows that for any arbitrary large complete cubic tree, there always will be at least one bad configuration.
+Lemma~\ref{lemma:always-bad} shows that for any arbitrary large complete cubic tree there is at least one bad configuration.
 One can note that Algorithm~\ref{alg:naive-conjecture-holds} (\texttt{GenerateUnsolvableConfs}) fails to produce the desired results 
 if there are any \emph{unsolvable} bad configurations.
 However it follows from the definition that if a configuration of $T$ is solvable 
 there is good configuration $conf^+$ on a super tree $T^+ \supset T$ such that there is one completion $h$ for witch $h_{|L(T)} = conf$.
 Therefore Lemma~\ref{lemma:always-bad} also holds for unsolvable configurations \emph{mutatis mutandis}.
-
-
-Consegui usar =).
-

@@ -1,0 +1,121 @@
+\chapter{Experimental Results} \label{chap:chap5}
+
+O quero falar: 
+Implemtacao em cpp e sagemath.
+Resultados do Problema
+Diferenca de performance 
+Subproblema 
+Resultado do subproblema 
+Modificado e nao modificado 
+
+
+PERGUNTA FABIO: TENHO QUE EXPLICAR O QUE É C++?
+
+
+In this chapter, we show the results obtained by coding and executing computer programs which implemented the algorithms introduced in Chapter~\ref{chap:alg-approach}, Chapter~\ref{chap:optimizations} and Appendix~\ref{apx:opt-algs} in C++ and, later, we also developed a second implementation and checker on SageMath.
+We chose C++ for the initial implementation due to the asymptotic complexity of the algorithms (see Section~\ref{sec:complexity-analysys}), 
+as it makes performance critical to be able to classify configurations of non-negligible size 
+and 
+C++ is a system programming language, hence, has no runtime overhead and it is ideal for performance sensitive implementations.
+Alternatives with the same characteristics were mainly C and Rust. 
+We didn't chose C for the lack of useful high-level constructs like vector (specifically std::pmr::vector)\footnote{See \url{https://en.cppreference.com/w/cpp/memory/polymorphic_allocator.html} for more information} that are available on C++ standard library and were widely used on our implementation.
+Rust were discarded for a lack of familiarity.
+
+%TODO: Definir solvability table
+Recall that the main algorithm (See~Algorithm~\ref{alg:opt-cojecture-holds}) can be split on the following steps: 
+1) Classify bad and good configurations of a complete cubic tree of a predefined size;
+2) Construct the solvability table for the bad configurations and check if the there are replacements such that all unsolvable bad configurations on the solvability table can be solved.
+Step 2 be simplified if minimal replacements (See~Definition~\ref{def:minimal-replacements}) were previously computed, we will label this process as step 0).
+In this case, for each pair $(c_0, C_s)$ on the solvability table we only need to check if $C_s$ is a superset of any minimal replacement $(c_0, C)$.
+This combined with the time needed to execute the steps for non trivial constants made us, during the development and testing of the C++ implementation, to devise a file oriented approach
+such that, on the end of each step, the result of the computation is written to files.
+
+This allowed steps to be computed in a temporally decoupled way, as the program is able to read the necessary information from the previously steps files and continue accordingly.
+Another benefit we got with this approach was to be able to develop a checker for the file outputs in SageMath.
+SageMath, according to the official website, is "a free open-source mathematics software system licensed under the GPL. It builds on top of many existing open-source packages: NumPy, SciPy, matplotlib, Sympy, Maxima, GAP, FLINT, R and many more.",
+and, most importantly for this work, it has a extensive undirect graph module that provides a lot of built in functionality in a python like syntax which is easier to implement and reason about,
+since it hides complexities related to memory management and low level operations which are an essential part of system programming languages.
+This allowed us to more easily recheck the results produced by the C++ implementation. 
+In the end, we rewrote the all algorithms in SageMath, as it the checkers already demanded most of them 
+and
+was useful to compare the timings of each implementations (see Section~\ref{sec:time-measurements}).
+The algorithms we presented in pseudo code on Chapter~\ref{chap:optimizations} and Appendix~\ref{apx:opt-algs} are the ones used in our SageMath implementation 
+slightly modified for brevity and clarity made possible by pseudo code expressiveness.
+
+
+\section{Time Measurements}\label{sec:time-measurements}
+In order to confirm our assumptions about the speed of execution between ours SageMath and C++ implementations 
+and to be able to discuss the trade-off between computing speed and prototyping/hypothesis testing speed (See section~\ref{sec:multi-implementations}),
+we will show, in every results section, the measurements of the time needed to compute them on each implementation.
+All the measurements were done using the tool \texttt{hyperfine}\footnote{The documentation and source code is freely available on \url{https://github.com/sharkdp/hyperfine}}
+with 5 warm up runs and 100 measurements runs in a machine with specifications shown on Table~\ref{tab:specs}.
+% hyperfine ./bin/program --warmup 5 --runs 100
+
+\begin{table}[h!] \label{tab:specs}
+\centering
+\caption{}
+\begin{tabular}{ll}
+\hline
+\textbf{Component} & \textbf{Specification} \\
+\hline
+Processor          & AMD Ryzen 7 5700\\
+RAM                & 32 GB DDR4 2400 MHz \\
+GPU                & AMD Radeon RX 6600\\
+Operating System   & OS: Arch Linux x86_64\\
+Kernel Version     & 6.15.7-arch1-1\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\caption{Execution Time for Different Implementations}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Experiment} & \multicolumn{2}{c|}{\textbf{Execution Time} (ms)} \\
+\hline
+& C++ & SageMath \\
+\hline
+Classifying Good and Bads & 23.3 \pm 0.5 & 1450 \pm 45 \\
+Exp 2               & 98.7  & 102.3 \\
+Exp 3               & 210.1 & 205.4 \\
+Exp 4               & 176.3 & 180.0 \\
+\hline
+\end{tabular}
+\label{tab:execution_time}
+\end{table}
+
+
+
+All of the results presented are considering $B_1 = \{0\}$.
+
+\section{Minimal Replacements}\label{sec:minimal-replacements}
+
+\section{Results for \cleb}
+\subsection{Classifying good and bad}
+Recall that the algorithms can be resumed as follows (See chapters Chapter~\ref{chap:alg-approach}~and~\ref{chap:optimizations} for details).
+On the start, we have one bad configuration $\{0\}$ and fifteen good ones.
+For each bad configuration, we produce the children configurations and check which of these are bad or good.
+Then we a have a new set of bad configurations and repeat the last step until the configurations are of a tree with height greater then a predefined maximum.
+Lastly we check which of the remaining bad configurations are solvable.
+
+On Table~\ref{tab:problem-results} we show the classification of the configurations obtained at each level of the tree.
+Its is important to keep 
+In this chapter we introduce the results we obtained by 
+\begin{table}[h!]\label{tab:problem-results}
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Tree Height} & \textbf{Bad Colorings} & \textbf{Good Colorings} & \textbf{Bad Colorings \%} \\
+\hline
+0 & 1 & 15 & 4\% \\
+1 & 10 & 25 & 28\% \\
+2 & 1800 & 15501 & 10.40\% \\
+\hline
+\end{tabular}
+\caption{Number of bad and good colorings obtained at each level}
+\end{table}
+
+\section{Results for Degenerated}
+
+\section{C++ Worth the troubles?} \label{sec:system-lang-implementation}
